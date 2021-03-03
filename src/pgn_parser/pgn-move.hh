@@ -18,15 +18,14 @@ namespace board
         /* initialize it with PgnMove::opt_piece_t { [PieceType] } */
         using opt_piece_t = std::optional<PieceType>;
 
-        PgnMove(const Position& start, const Position& end, PieceType piece,
+        PgnMove(const Position &start, const Position &end, PieceType piece,
                 bool capture, ReportType report,
-                const opt_piece_t& promotion = std::nullopt);
+                const opt_piece_t &promotion = std::nullopt);
 
         /*! \brief Generate a castling given a color and a side */
         static PgnMove generate_castling(bool queen_side, Color color);
 
         void report_set(ReportType report);
-
 
     private:
         // The original position of the piece

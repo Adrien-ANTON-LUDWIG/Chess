@@ -1,0 +1,9 @@
+build
+.vscode
+CMakeFiles
+*.swp
+.DS_Store
+*.o
+*.a
+*.so
+*.png

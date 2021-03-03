@@ -1,8 +1,8 @@
 #include "pgn-parser.hh"
 
 #include <fstream>
-#include <regex>
 #include <iostream>
+#include <regex>
 
 #include "pgn-exception.hh"
 #include "piece-type.hh"
@@ -23,7 +23,7 @@ namespace pgn_parser
     ** parse end of game. return false if it's not
     ** a valid end
     */
-    bool parse_end(const std::string& word)
+    bool parse_end(const std::string &word)
     {
         return word == "1/2-1/2" || word == "1-0" || word == "0-1"
             || word == "*";
@@ -33,10 +33,11 @@ namespace pgn_parser
     ** Parse move-text.
     ** An exception is thrown if there are syntax errors
     */
-    void parse_action(const std::string& word)
+    void parse_action(const std::string &word)
     {
         std::regex san_regex{
-            "[KQBNR]?[a-h]?[1-8]?[x-]?[a-h][1-8](=[QBNR])?[+#]?"};
+            "[KQBNR]?[a-h]?[1-8]?[x-]?[a-h][1-8](=[QBNR])?[+#]?"
+        };
         if (!std::regex_match(word, san_regex) /* not a standard move */
             && word[0] != 'O' /* not a castling */)
             throw pgn_parser::PgnParsingException("syntax error", word);
@@ -62,16 +63,16 @@ namespace pgn_parser
     }
 
     /* simply parse turn number token */
-    void parse_turn_number(const std::string& word)
+    void parse_turn_number(const std::string &word)
     {
-        std::regex number_regex{"[[:digit:]]+"};
+        std::regex number_regex{ "[[:digit:]]+" };
         if (!std::regex_match(word, number_regex))
             throw pgn_parser::PgnParsingException("wrong turn number", word);
     }
 
-    board::PgnMove parse_castling(const std::string& word, board::Color side)
+    board::PgnMove parse_castling(const std::string &word, board::Color side)
     {
-        std::regex castling_regex{"O-O(-O)?[+#]{0,1}"};
+        std::regex castling_regex{ "O-O(-O)?[+#]{0,1}" };
         if (!std::regex_match(word, castling_regex))
             throw pgn_parser::PgnParsingException("bad castling", word);
 
@@ -87,7 +88,7 @@ namespace pgn_parser
         return board::PgnMove::generate_castling(queen_side, side);
     }
 
-    ReportType parse_report(const std::string& word)
+    ReportType parse_report(const std::string &word)
     {
         if (word.back() == '+')
             return ReportType::CHECK;
@@ -97,10 +98,10 @@ namespace pgn_parser
     }
 
     // parse the header of a pgn file as a string
-    const std::string parse_header(std::ifstream& pgn)
+    const std::string parse_header(std::ifstream &pgn)
     {
         std::string header_part;
-        std::regex header_regex{"\\[.*\\]"};
+        std::regex header_regex{ "\\[.*\\]" };
 
         while (std::getline(pgn, header_part, '\n'))
         {
@@ -115,7 +116,7 @@ namespace pgn_parser
     }
 
     // parse the body of a pgn file as a list of string
-    const std::vector<std::string> parse_body(std::ifstream& pgn)
+    const std::vector<std::string> parse_body(std::ifstream &pgn)
     {
         /* tokenize everything */
         std::vector<std::string> tokens;
@@ -123,7 +124,7 @@ namespace pgn_parser
 
         while (pgn >> token)
         {
-            std::stringstream ss{token};
+            std::stringstream ss{ token };
             std::string sub_token;
 
             while (std::getline(ss, sub_token, '.'))
@@ -137,7 +138,7 @@ namespace pgn_parser
 
         try
         {
-            for (const auto& tok : tokens)
+            for (const auto &tok : tokens)
             {
                 if (parse_end(tok))
                     break;
@@ -150,7 +151,8 @@ namespace pgn_parser
                     moves_txt.push_back(tok);
                 }
             }
-        } catch (const pgn_parser::PgnParsingException& parse_error)
+        }
+        catch (const pgn_parser::PgnParsingException &parse_error)
         {
             std::cerr << parse_error.what() << '\n';
             std::exit(1);
@@ -161,7 +163,7 @@ namespace pgn_parser
 
     // convert a list of string into a list of move
     const std::vector<board::PgnMove>
-    string_to_move(const std::vector<std::string>& body)
+    string_to_move(const std::vector<std::string> &body)
     {
         auto moves =
             std::for_each(body.cbegin(), body.cend(), MoveTextParser{});
@@ -170,10 +172,10 @@ namespace pgn_parser
 
     board::PgnMove::opt_piece_t MoveTextParser::parse_promotion(char promotion)
     {
-        return {board::char_to_piece(promotion)};
+        return { board::char_to_piece(promotion) };
     }
 
-    void MoveTextParser::operator()(const std::string& word)
+    void MoveTextParser::operator()(const std::string &word)
     {
         using PieceType = board::PieceType;
         using Position = board::Position;
@@ -186,7 +188,8 @@ namespace pgn_parser
                 auto move = parse_castling(word, side_);
                 move.report_set(parse_report(word));
                 moves_.push_back(move);
-            } catch (const pgn_parser::PgnParsingException& parse_error)
+            }
+            catch (const pgn_parser::PgnParsingException &parse_error)
             {
                 std::cerr << parse_error.what() << '\n';
                 std::exit(1);
@@ -201,11 +204,11 @@ namespace pgn_parser
             if (moving_piece != PieceType::PAWN)
                 iter++; // a piece was indicated => incr iterator
 
-            Position start{to_file(*iter++), to_rank(*iter++)};
+            Position start{ to_file(*iter++), to_rank(*iter++) };
 
             bool piece_taken = (*iter++ == 'x');
 
-            Position end{to_file(*iter++), to_rank(*iter++)};
+            Position end{ to_file(*iter++), to_rank(*iter++) };
 
             /*
             ** parse promotion if there is one + move iter
@@ -227,7 +230,7 @@ namespace pgn_parser
         return moves_;
     }
 
-    const std::vector<board::PgnMove> parse_pgn(const std::string& file)
+    const std::vector<board::PgnMove> parse_pgn(const std::string &file)
     {
         std::ifstream pgn(file);
         parse_header(pgn);

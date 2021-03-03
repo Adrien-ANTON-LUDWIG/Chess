@@ -41,8 +41,8 @@ namespace listener
         ** @param to:    The final position of the piece.
         */
         virtual void on_piece_moved(const board::PieceType piece,
-                                    const board::Position& from,
-                                    const board::Position& to) = 0;
+                                    const board::Position &from,
+                                    const board::Position &to) = 0;
 
         /**
         ** \brief Must be called every time a piece is taken.
@@ -52,7 +52,7 @@ namespace listener
         ** @param at:    The position where the piece is taken.
         */
         virtual void on_piece_taken(const board::PieceType piece,
-                                    const board::Position& at) = 0;
+                                    const board::Position &at) = 0;
 
         /**
         ** \brief Must be called when a pawn is promoted.
@@ -62,7 +62,7 @@ namespace listener
         ** @param at:    The position of the piece promoted.
         */
         virtual void on_piece_promoted(const board::PieceType piece,
-                                       const board::Position& at) = 0;
+                                       const board::Position &at) = 0;
 
         /**
         ** \brief Event when a Kingside castling happens.
@@ -132,7 +132,7 @@ namespace listener
 #define LISTENER_EXPORT(TYPE)                                                  \
     extern "C"                                                                 \
     {                                                                          \
-        Listener* listener_create()                                            \
+        Listener *listener_create()                                            \
         {                                                                      \
             return new TYPE();                                                 \
         }                                                                      \

@@ -10,18 +10,17 @@ namespace ai
         , binc(0)
     {}
 
-    bool UCITime::set(const std::string& property, double value)
+    bool UCITime::set(const std::string &property, double value)
     {
-        struct {
-            const std::string& name;
-            double& attribute;
-        } properties[] = {
-            { "movetime", movetime },
-            { "wtime", wtime },
-            { "btime", btime },
-            { "winc", winc },
-            { "binc", binc }
-        };
+        struct
+        {
+            const std::string &name;
+            double &attribute;
+        } properties[] = { { "movetime", movetime },
+                           { "wtime", wtime },
+                           { "btime", btime },
+                           { "winc", winc },
+                           { "binc", binc } };
 
         for (size_t i = 0; i < sizeof(properties) / sizeof(*properties); i++)
         {
@@ -34,4 +33,4 @@ namespace ai
 
         return false;
     }
-}
+} // namespace ai

@@ -5,12 +5,12 @@ namespace board
         , rank_(rank)
     {}
 
-    inline bool Position::operator==(const Position& pos) const
+    inline bool Position::operator==(const Position &pos) const
     {
         return file_get() == pos.file_get() && rank_get() == pos.rank_get();
     }
 
-    inline bool Position::operator!=(const Position& pos) const
+    inline bool Position::operator!=(const Position &pos) const
     {
         return !(*this == pos);
     }

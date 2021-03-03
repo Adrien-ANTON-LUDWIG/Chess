@@ -9,12 +9,12 @@ namespace pgn_parser
     class PgnParsingException : public std::exception
     {
     public:
-        PgnParsingException(const std::string& message,
-                            const std::string& token) noexcept;
+        PgnParsingException(const std::string &message,
+                            const std::string &token) noexcept;
 
         virtual ~PgnParsingException() noexcept = default;
 
-        virtual const char* what() const noexcept override;
+        virtual const char *what() const noexcept override;
 
     private:
         const std::string message_;

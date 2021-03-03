@@ -12,7 +12,7 @@ namespace ai
      * - e2e4
      * - e1g1
      */
-    void play_move(const std::string& move);
+    void play_move(const std::string &move);
 
     /** Reads lines until both a `position` and `go` commands are entered.
      * This function handles a subset of the `UCI` protocol.
@@ -29,5 +29,5 @@ namespace ai
      * - position fen rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1
      *      moves f7f5
      */
-    std::string get_board(const std::string& name, UCITime& uci_time);
+    std::string get_board(const std::string &name, UCITime &uci_time);
 } // namespace ai

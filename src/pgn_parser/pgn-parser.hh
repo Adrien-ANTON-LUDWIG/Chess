@@ -9,7 +9,7 @@
 namespace pgn_parser
 {
     // parse a PGN file into a list of moves
-    const std::vector<board::PgnMove> parse_pgn(const std::string& file);
+    const std::vector<board::PgnMove> parse_pgn(const std::string &file);
 
     /*
     ** Functor class used to parse the pgn part associated with
@@ -23,7 +23,7 @@ namespace pgn_parser
         MoveTextParser() = default;
 
         // Parse a movetext token into a word and store it in moves_
-        void operator()(const std::string& word);
+        void operator()(const std::string &word);
 
         // return moves_ which contains all parsed moves
         const std::vector<board::PgnMove> moves_get();
@@ -45,13 +45,13 @@ namespace pgn_parser
     /* Parse a string, deduce if a move induce a check,
     ** a checkmate or nothing
     */
-    bool parse_end(const std::string& word);
+    bool parse_end(const std::string &word);
 
     /*
     ** Check is a string is a move and throw a exception
     ** if it is not
     */
-    void parse_action(const std::string& word);
+    void parse_action(const std::string &word);
 
     // Convert a charater into a PieceType
     board::PieceType parse_piecetype(char symbol);
@@ -60,34 +60,34 @@ namespace pgn_parser
     ** Check is a string is a turn number and throw
     ** a exception if it is not
     */
-    void parse_turn_number(const std::string& word);
+    void parse_turn_number(const std::string &word);
 
     /*
     ** Parse a castling into a move and throw a exception
     ** if it is not
     */
-    board::PgnMove parse_castling(const std::string& word, board::Color side);
+    board::PgnMove parse_castling(const std::string &word, board::Color side);
 
     /*
     ** Parse a string into a report
     */
-    ReportType parse_report(const std::string& word);
+    ReportType parse_report(const std::string &word);
 
     /*
     ** Parse the header of a pgn. It is only to move
     ** forward our reader
     */
-    const std::string parse_header(std::ifstream& pgn);
+    const std::string parse_header(std::ifstream &pgn);
 
     /*
     ** Parse the body of a pgn file and extract each move
     */
-    const std::vector<std::string> parse_body(std::ifstream& pgn);
+    const std::vector<std::string> parse_body(std::ifstream &pgn);
 
     /*
     ** Convert a vector of string that represent the moves of
     ** the pgn into a vector of PgnMove
     */
     const std::vector<board::PgnMove>
-    string_to_move(const std::vector<std::string>& body);
+    string_to_move(const std::vector<std::string> &body);
 } // namespace pgn_parser

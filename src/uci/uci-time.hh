@@ -13,7 +13,7 @@ namespace ai
         UCITime();
 
         /*! \brief Sets the attribute named property to a given value. */
-        bool set(const std::string& property, double value);
+        bool set(const std::string &property, double value);
 
         /*! \brief Maximum amount of time for a move. */
         double movetime;
@@ -30,4 +30,4 @@ namespace ai
         /*! \brief Per-move increment for black. */
         double binc;
     };
-}
+} // namespace ai

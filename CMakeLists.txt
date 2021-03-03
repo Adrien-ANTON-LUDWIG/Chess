@@ -4,19 +4,31 @@
 # set(MYVAR "val1" "val2") creates a list
 
 set(OPT_FLAGS
-    ""
+    "-Wall -Wextra -Werror -pedantic -std=c++17 -g"
 )
 
 # END OPTIMIZATION FLAGS
 # SOURCES : FIXME
 # Put all your sources here EXCEPT YOUR MAIN.CC
 set(SRC_ENGINE
-    ""
+    src/board/board.cc
+    src/board/move.cc
+    src/pgn_parser/pgn-exception.cc
+    src/pgn_parser/pgn-move.cc
+    src/pgn_parser/pgn-parser.cc
+    src/uci/uci-time.cc
+    src/uci/uci.cc
+    src/main.cc
 )
 
 # Directories containing headers must be specified in the include_directories()
 include_directories(
-    ""
+    "src/board"
+    "src/listener"
+    "src/misc"
+    "src/pgn_parser"
+    "src/pieces"
+    "src/uci"
 )
 
 # Put your test files here
@@ -65,7 +77,7 @@ if(GTest_FOUND)
   include(GoogleTest)
 
   add_executable(tests)
-  target_sources(tests PRIVATE 
+  target_sources(tests PRIVATE
     ${SRC_GTEST}
     ${SRC_ENGINE}
   )
