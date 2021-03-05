@@ -8,5 +8,4 @@ namespace board
         WHITE = false,
         BLACK = true
     };
-
 } // namespace board

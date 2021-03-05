@@ -49,4 +49,19 @@ namespace board
         report_ = report;
     }
 
+    PieceType PgnMove::get_piece()
+    {
+        return piece_;
+    }
+
+    const Position PgnMove::get_start()
+    {
+        return start_;
+    }
+
+    const Position PgnMove::get_end()
+    {
+        return end_;
+    }
+
 } // namespace board

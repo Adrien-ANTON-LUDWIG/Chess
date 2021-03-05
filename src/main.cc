@@ -2,14 +2,15 @@
 #include <iostream>
 
 #include "board.hh"
+#include "move.hh"
+#include "pgn-parser.hh"
 
 namespace po = boost::program_options;
 
 int main(int argc, const char *argv[])
 {
-    board::Chessboard *ch = new board::Chessboard();
-    ch->print_chessboard();
-    delete ch;
+    board::Chessboard *board = new board::Chessboard();
+    board->print_chessboard();
     try
     {
         po::options_description desc{ "Options" };
@@ -24,7 +25,22 @@ int main(int argc, const char *argv[])
         po::notify(vm);
 
         if (vm.count("pgn"))
-            std::cout << "pgn: " << vm["pgn"].as<std::string>() << '\n';
+        {
+            auto file = vm["pgn"].as<std::string>();
+            auto moves = pgn_parser::parse_pgn(file);
+            bool color = false;
+            for (auto move : moves)
+            {
+                board->do_move(board::Move(static_cast<board::Color>(color),
+                                           move.get_piece(), move.get_start(),
+                                           move.get_end()));
+                color = !color;
+            }
+
+            std::cout << "Pgn - " << file << " :\n";
+            board->print_chessboard();
+            // std::cout << "pgn: " << vm["pgn"].as<std::string>() << '\n';
+        }
         else if (vm.count("listener"))
             std::cout << "listener: "
                       << (vm["listener"].as<std::vector<std::string>>()).size()
@@ -36,4 +52,5 @@ int main(int argc, const char *argv[])
     {
         std::cerr << e.what() << '\n';
     }
+    delete board;
 }

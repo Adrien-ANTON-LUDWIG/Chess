@@ -12,7 +12,7 @@ namespace board
      * piece on the board */
     enum class PieceType
     {
-        QUEEN,
+        QUEEN = 0,
         ROOK,
         BISHOP,
         KNIGHT,

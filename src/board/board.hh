@@ -1,5 +1,6 @@
 #pragma once
 
+#include <bitset>
 #include <map>
 #include <vector>
 
@@ -27,18 +28,37 @@ namespace board
 
         void print_chessboard();
 
+        std::optional<Color> piece_to_position(const Position &position);
+
+        std::vector<Move> generate_legal_moves_knight(const Position &position,
+                                                      const Color &color);
+        std::vector<Move> generate_legal_moves_pawn(const Position &position,
+                                                    const Color &color);
+
+        void generate_legal_moves_diagonal(const Move &move,
+                                           const size_t &distance,
+                                           std::vector<Move> &legal_moves,
+                                           int dir_x, int dir_y);
+
+        void generate_legal_moves_forward(const Move &move,
+                                          const size_t &distance,
+                                          std::vector<Move> &legal_moves);
+
+        std::vector<Move> generate_legal_moves_generic(const Position &position,
+                                                       Color piece_color,
+                                                       PieceType type);
+
     private:
-        uint64_t black_pawn_;
-        uint64_t black_rook_;
-        uint64_t black_bishop_;
-        uint64_t black_knight_;
-        uint64_t black_queen_;
-        uint64_t black_king_;
-        uint64_t white_pawn_;
-        uint64_t white_rook_;
-        uint64_t white_bishop_;
-        uint64_t white_knight_;
-        uint64_t white_queen_;
-        uint64_t white_king_;
+        // pieces_[Color][PieceType]
+        std::array<std::array<std::bitset<64>, 6>, 2> pieces_;
+
+        int turn_;
+        bool white_turn_;
+        bool white_king_castling_;
+        bool white_queen_castling_;
+        bool black_king_castling_;
+        bool black_queen_castling_;
+        // en_passant_
+        int last_fifty_turn_;
     };
 } // namespace board

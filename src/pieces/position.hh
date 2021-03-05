@@ -39,9 +39,13 @@ namespace board
     {
     public:
         Position(File file, Rank rank);
+        Position(int array_pos);
+        Position(const Position &position) = default;
 
         File file_get() const;
         Rank rank_get() const;
+
+        int to_index() const;
 
         bool operator==(const Position &pos) const;
         bool operator!=(const Position &pos) const;

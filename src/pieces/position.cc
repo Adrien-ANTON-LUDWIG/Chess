@@ -2,28 +2,17 @@
 
 namespace board
 {
-    Position::Position(File file, Rank rank)
-        : file_(file)
-        , rank_(rank)
-    {}
-
-    File Position::file_get() const
+    Position::Position(int array_pos)
     {
-        return file_;
+        int y = array_pos / 8;
+        int x = 7 - array_pos % 8;
+
+        this->file_ = static_cast<File>(x);
+        this->rank_ = static_cast<Rank>(y);
     }
 
-    Rank Position::rank_get() const
+    int Position::to_index() const
     {
-        return rank_;
-    }
-
-    bool Position::operator==(const Position &pos) const
-    {
-        return file_ == pos.file_ && rank_ == pos.rank_;
-    }
-
-    bool Position::operator!=(const Position &pos) const
-    {
-        return !(*this == pos);
+        return static_cast<int>(rank_) * 8 + 7 - static_cast<int>(file_);
     }
 } // namespace board
