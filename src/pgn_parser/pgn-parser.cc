@@ -165,8 +165,12 @@ namespace pgn_parser
     const std::vector<board::PgnMove>
     string_to_move(const std::vector<std::string> &body)
     {
+        for (auto m : body)
+            std::cout << m << '\n';
+
         auto moves =
             std::for_each(body.cbegin(), body.cend(), MoveTextParser{});
+
         return moves.moves_get();
     }
 

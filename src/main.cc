@@ -18,7 +18,8 @@ int main(int argc, const char *argv[])
                                               "path to the PGN game file")(
             "listener,l", po::value<std::vector<std::string>>()->multitoken(),
             "list of paths to listener plugin")(
-            "perft", po::value<std::string>(), "path to a perft file");
+            "perft", po::value<std::string>(),
+            "path to a perft file")("play", "Stdin waits for moves");
 
         po::variables_map vm;
         po::store(po::parse_command_line(argc, argv, desc), vm);
@@ -47,6 +48,24 @@ int main(int argc, const char *argv[])
                       << '\n';
         else if (vm.count("perft"))
             std::cout << "perft: " << vm["perft"].as<std::string>() << '\n';
+
+        else if (vm.count("play"))
+        {
+            bool color = false;
+
+            while (1)
+            {
+                std::vector<std::string> move_string = { "" };
+                std::cin >> move_string[0];
+
+                auto moves = pgn_parser::string_to_move(move_string);
+
+                board->do_move(board::Move(
+                    static_cast<board::Color>(color), moves[0].get_piece(),
+                    moves[0].get_start(), moves[0].get_end()));
+                color = !color;
+            }
+        }
     }
     catch (const po::error &e)
     {

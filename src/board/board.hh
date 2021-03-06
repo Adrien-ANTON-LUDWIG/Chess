@@ -19,6 +19,9 @@ namespace board
 
         std::vector<Move> generate_legal_moves();
         bool is_move_legal(Move move);
+
+        void update_piece(const int &color, const int &type,
+                          const int &position, const bool &arrive);
         void do_move(Move move);
         bool is_check();
         bool is_checkmate();
@@ -28,7 +31,7 @@ namespace board
 
         void print_chessboard();
 
-        std::optional<Color> piece_to_position(const Position &position);
+        std::optional<Color> is_piece_to_position(const Position &position);
 
         std::vector<Move> generate_legal_moves_knight(const Position &position,
                                                       const Color &color);
@@ -51,14 +54,17 @@ namespace board
     private:
         // pieces_[Color][PieceType]
         std::array<std::array<std::bitset<64>, 6>, 2> pieces_;
+        std::array<std::bitset<64>, 2> color_boards_;
+        std::bitset<64> board_;
 
         int turn_;
+        Color side_turn_ = Color::WHITE;
         bool white_turn_;
         bool white_king_castling_;
         bool white_queen_castling_;
         bool black_king_castling_;
         bool black_queen_castling_;
-        // en_passant_
+        std::optional<Position> en_passant_ = std::nullopt;
         int last_fifty_turn_;
     };
 } // namespace board

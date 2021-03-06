@@ -32,13 +32,26 @@ namespace board
                [static_cast<int>(PieceType::PAWN)] = 0x00FF000000000000;
         pieces_[static_cast<int>(Color::BLACK)]
                [static_cast<int>(PieceType::KING)] = 0x0800000000000000;
+
+        color_boards_[static_cast<int>(Color::WHITE)] = 0x000000000000FFFF;
+        color_boards_[static_cast<int>(Color::BLACK)] = 0xFFFF000000000000;
+        board_ = 0xFFFF00000000FFFF;
     }
 
     // Print the Chessboard in terminal
+
     void Chessboard::print_chessboard()
     {
         std::string characters[] = { "♛", "♜", "♝", "♞", "♟", "♚",
                                      "♕", "♖", "♗", "♘", "♙", "♔" };
+
+        std::bitset<64> possible_moves;
+        auto legal_moves = generate_legal_moves();
+
+        for (auto move : legal_moves)
+            possible_moves[move.end_.to_index()] = 1;
+        /*
+         */
 
         bool white = false;
 
@@ -48,7 +61,9 @@ namespace board
                 std::cout << std::to_string(8 - (j + 1) / 8) + " ";
             bool filled = false;
 
-            if (white)
+            if (possible_moves[63 - j])
+                std::cout << "\x1B[45m";
+            else if (white)
                 std::cout << "\x1B[44m";
 
             for (int c = 0; c < 2; c++)
@@ -63,7 +78,7 @@ namespace board
             if (!filled)
                 std::cout << "   ";
 
-            if (white)
+            if (white || possible_moves[63 - j])
                 std::cout << "\x1B[0m";
 
             if ((j + 1) % 8 == 0)
@@ -78,29 +93,50 @@ namespace board
         return;
     }
 
+    void Chessboard::update_piece(const int &color, const int &type,
+                                  const int &position, const bool &arrive)
+    {
+        pieces_[color][type][position] = arrive;
+        color_boards_[color][position] = arrive;
+        board_[position] = arrive;
+    }
+
     // Update the board with a move
     void Chessboard::do_move(Move move)
     {
+        static std::array en_passant_start = { Rank::FOUR, Rank::FIVE };
+        static std::array en_passant_end = { Rank::TWO, Rank::SEVEN };
         int color = static_cast<int>(move.color_);
+        int opponent_color = static_cast<int>(!static_cast<bool>(color));
         int type = static_cast<int>(move.piece_type_);
         int end = move.end_.to_index();
-        pieces_[color][type][move.start_.to_index()] = 0;
+        int start = move.start_.to_index();
+        update_piece(color, type, start, 0);
 
-        for (int c = 0; c < 2; c++)
+        if (color_boards_[opponent_color][end])
+        {
             for (int p = 0; p < 6; p++)
-                if (pieces_[c][p][end])
-                {
-                    pieces_[c][p][end] = 0;
-                    last_fifty_turn_ = 0;
-                }
+                if (pieces_[opponent_color][p][end])
+                    update_piece(opponent_color, p, end, 0);
+            last_fifty_turn_ = 0;
+        }
 
-        pieces_[color][type][end] = 1;
+        update_piece(color, type, end, 1);
+        side_turn_ = static_cast<Color>(!static_cast<bool>(side_turn_));
+
+        if (move.piece_type_ == PieceType::PAWN
+            && move.start_.rank_get() == en_passant_start[color]
+            && move.end_.rank_get() == en_passant_end[color])
+            en_passant_ = move.end_;
+        else
+            en_passant_ = std::nullopt;
 
         print_chessboard();
     }
 
     // Return the color of the piece at position
-    std::optional<Color> Chessboard::piece_to_position(const Position &position)
+    std::optional<Color>
+    Chessboard::is_piece_to_position(const Position &position)
     {
         for (int c = 0; c < 2; c++)
             for (int p = 0; p < 6; p++)
@@ -145,7 +181,7 @@ namespace board
                 auto new_rank = static_cast<Rank>(rank_int);
                 auto new_file = static_cast<File>(file_int);
                 Position move(new_file, new_rank);
-                auto move_color = piece_to_position(move);
+                auto move_color = is_piece_to_position(move);
                 if (move_color == std::nullopt
                     || move_color != color) // Add vérif case pas en échec
                     moves.push_back(
@@ -157,44 +193,69 @@ namespace board
         return moves;
     }
 
+    int opposite_number(int a, bool neg)
+    {
+        if (neg)
+            return -a;
+        return a;
+    }
+
     // Generate a vector of all legal moves
-    /**
-     * @brief
-     *
-     * @param position
-     * @param color
-     * @return std::vector<Move>
-     */
     std::vector<Move>
     Chessboard::generate_legal_moves_pawn(const Position &position,
                                           const Color &color)
     {
-        // TODO en passant
-        // TODO capture
         std::vector<Move> moves;
         static std::array pawns_rank = { Rank::TWO, Rank::SEVEN };
         int color_int = static_cast<int>(color);
+        int side = opposite_number(1, color_int);
+
+        // TODO en passant
+
+        if (en_passant_ != std::nullopt)
+            ;
+
+        // Capture
+        Position capture1(
+            static_cast<File>(static_cast<int>(position.file_get()) - 1),
+            static_cast<Rank>(static_cast<int>(position.rank_get())
+                              + 1 * side));
+        auto capture1_color = is_piece_to_position(capture1);
+
+        if (capture1_color != std::nullopt && capture1_color != color)
+            moves.push_back(Move(color, PieceType::PAWN, position, capture1));
+
+        Position capture2(
+            static_cast<File>(static_cast<int>(position.file_get()) + 1),
+            static_cast<Rank>(static_cast<int>(position.rank_get())
+                              + 1 * side));
+        auto capture2_color = is_piece_to_position(capture2);
+
+        if (capture2_color != std::nullopt && capture2_color != color)
+            moves.push_back(Move(color, PieceType::PAWN, position, capture2));
+
+        // Move front
         Position front(position.file_get(),
                        static_cast<Rank>(static_cast<int>(position.rank_get())
-                                         + 1 * (-color_int)));
-        auto front_color = piece_to_position(front);
+                                         + 1 * side));
 
-        if (front_color == color)
+        auto front_color = is_piece_to_position(front);
+
+        if (front_color != std::nullopt)
             return moves;
 
         moves.push_back(Move(color, PieceType::PAWN, position, front));
 
-        if (front_color != std::nullopt
-            || position.rank_get() != pawns_rank[color_int])
+        if (position.rank_get() != pawns_rank[color_int])
             return moves;
 
         Position front2(position.file_get(),
                         static_cast<Rank>(static_cast<int>(position.rank_get())
-                                          + 2 * (-color_int)));
+                                          + 2 * side));
 
-        auto front2_color = piece_to_position(front2);
+        auto front2_color = is_piece_to_position(front2);
 
-        if (front2_color == color)
+        if (front2_color != std::nullopt)
             return moves;
 
         moves.push_back(Move(color, PieceType::PAWN, position, front2));
@@ -233,12 +294,11 @@ namespace board
                                         static_cast<Rank>(new_y));
                 auto new_move =
                     Move(move.color_, move.piece_type_, move.start_, new_pos);
-                auto piece = piece_to_position(new_pos);
-                if (piece != std::nullopt && *piece == move.color_)
+                auto piece = is_piece_to_position(new_pos);
+                if (piece != move.color_)
                     legal_moves.push_back(new_move);
                 if (piece != std::nullopt)
                     return;
-                legal_moves.push_back(new_move);
                 generate_legal_moves_diagonal(new_move, distance - 1,
                                               legal_moves, dir_x, dir_y);
             }
@@ -263,6 +323,7 @@ namespace board
         int distances[] = { 256, 256, 256, 0, 0, 1 };
         bool forwards[] = { true, true, false, false, false, true };
         bool diagonals[] = { true, false, true, false, false, true };
+        // Q,R,B,P,N,K
 
         bool forward = forwards[static_cast<int>(type)];
         int distance = distances[static_cast<int>(type)];
@@ -280,11 +341,6 @@ namespace board
     bool is_move_legal(Move move)
     {
         (void)move;
-        // Check if destination is same color
-        // Check if destination is check
-        // Check if there is another piece on the way (Knight ignore)
-        // En passant
-        // Castle
         return true;
     }
 
@@ -292,37 +348,37 @@ namespace board
     {
         std::vector<Move> moves;
 
-        for (int c = 0; c < 2; c++)
-            for (int p = 0; p < 6; p++)
-                for (int i = 0; i < 64; i++)
-                    if (pieces_[c][p][i])
-                    {
-                        Position position(i);
-                        auto type = static_cast<PieceType>(p);
-                        auto color = static_cast<Color>(c);
+        for (int p = 0; p < 6; p++)
+            for (int i = 0; i < 64; i++)
+                if (pieces_[static_cast<int>(side_turn_)][p][i])
+                {
+                    Position position(i);
+                    auto type = static_cast<PieceType>(p);
+                    auto color =
+                        static_cast<Color>(static_cast<int>(side_turn_));
 
-                        if (type == PieceType::PAWN)
-                        {
-                            auto new_moves =
-                                generate_legal_moves_pawn(position, color);
-                            moves.insert(moves.end(), new_moves.begin(),
-                                         new_moves.end());
-                        }
-                        else if (type == PieceType::KNIGHT)
-                        {
-                            auto new_moves =
-                                generate_legal_moves_knight(position, color);
-                            moves.insert(moves.end(), new_moves.begin(),
-                                         new_moves.end());
-                        }
-                        else
-                        {
-                            auto new_moves = generate_legal_moves_generic(
-                                position, color, type);
-                            moves.insert(moves.end(), new_moves.begin(),
-                                         new_moves.end());
-                        }
+                    if (type == PieceType::PAWN)
+                    {
+                        auto new_moves =
+                            generate_legal_moves_pawn(position, color);
+                        moves.insert(moves.end(), new_moves.begin(),
+                                     new_moves.end());
                     }
+                    else if (type == PieceType::KNIGHT)
+                    {
+                        auto new_moves =
+                            generate_legal_moves_knight(position, color);
+                        moves.insert(moves.end(), new_moves.begin(),
+                                     new_moves.end());
+                    }
+                    else
+                    {
+                        auto new_moves =
+                            generate_legal_moves_generic(position, color, type);
+                        moves.insert(moves.end(), new_moves.begin(),
+                                     new_moves.end());
+                    }
+                }
 
         return moves;
     }
