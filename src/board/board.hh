@@ -22,6 +22,8 @@ namespace board
 
         void update_piece(const int &color, const int &type,
                           const int &position, const bool &arrive);
+
+        void check_eating_en_passant(const Move &move);
         void do_move(Move move);
         bool is_check();
         bool is_checkmate();

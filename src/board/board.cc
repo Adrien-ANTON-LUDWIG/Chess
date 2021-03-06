@@ -101,11 +101,25 @@ namespace board
         board_[position] = arrive;
     }
 
+    void Chessboard::check_eating_en_passant(const Move &move)
+    {
+        static std::array behind = { 1, -1 };
+        if (en_passant_ != std::nullopt && move.piece_type_ == PieceType::PAWN
+            && move.end_.file_get() == en_passant_->file_get()
+            && move.end_.rank_get() - en_passant_->rank_get()
+                == behind[move.color_])
+        {
+            update_piece(!move.color_, PieceType::PAWN, en_passant_->to_index(),
+                         0);
+            last_fifty_turn_ = 0;
+        }
+    }
+
     // Update the board with a move
     void Chessboard::do_move(Move move)
     {
-        static std::array en_passant_start = { Rank::FOUR, Rank::FIVE };
-        static std::array en_passant_end = { Rank::TWO, Rank::SEVEN };
+        static std::array en_passant_start = { Rank::TWO, Rank::SEVEN };
+        static std::array en_passant_end = { Rank::FOUR, Rank::FIVE };
         int color = static_cast<int>(move.color_);
         int opponent_color = static_cast<int>(!static_cast<bool>(color));
         int type = static_cast<int>(move.piece_type_);
@@ -113,6 +127,7 @@ namespace board
         int start = move.start_.to_index();
         update_piece(color, type, start, 0);
 
+        check_eating_en_passant(move);
         if (color_boards_[opponent_color][end])
         {
             for (int p = 0; p < 6; p++)
@@ -211,9 +226,14 @@ namespace board
         int side = opposite_number(1, color_int);
 
         // TODO en passant
-
-        if (en_passant_ != std::nullopt)
-            ;
+        if (en_passant_ != std::nullopt
+            && en_passant_->rank_get() == position.rank_get()
+            && abs(en_passant_->file_get() - position.file_get()) == 1)
+            moves.push_back(
+                Move(color, PieceType::PAWN, position,
+                     Position(en_passant_->file_get(),
+                              static_cast<Rank>(en_passant_->rank_get()
+                                                + 1 * side))));
 
         // Capture
         Position capture1(
