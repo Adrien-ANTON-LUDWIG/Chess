@@ -9,3 +9,5 @@ namespace board
         BLACK = true
     };
 } // namespace board
+
+        

@@ -46,7 +46,7 @@ namespace board
                                      "♕", "♖", "♗", "♘", "♙", "♔" };
 
         std::bitset<64> possible_moves;
-        auto legal_moves = generate_legal_moves();
+        auto legal_moves = generate_legal_moves(turn_);
 
         for (auto move : legal_moves)
             possible_moves[move.end_.to_index()] = 1;
@@ -101,6 +101,11 @@ namespace board
         board_[position] = arrive;
     }
 
+    Color Chessboard::get_side_turn()
+    {
+        return static_cast<Color>(turn_ % 2);
+    }
+
     void Chessboard::check_eating_en_passant(const Move &move)
     {
         static std::array behind = { 1, -1 };
@@ -137,7 +142,6 @@ namespace board
         }
 
         update_piece(color, type, end, 1);
-        side_turn_ = static_cast<Color>(!static_cast<bool>(side_turn_));
 
         if (move.piece_type_ == PieceType::PAWN
             && move.start_.rank_get() == en_passant_start[color]
@@ -147,6 +151,7 @@ namespace board
             en_passant_ = std::nullopt;
 
         print_chessboard();
+        turn_++;
     }
 
     // Return the color of the piece at position
@@ -315,7 +320,7 @@ namespace board
                 auto new_move =
                     Move(move.color_, move.piece_type_, move.start_, new_pos);
                 auto piece = is_piece_to_position(new_pos);
-                if (piece != move.color_)
+                if (piece != move.color_ && (move.piece_type_ != PieceType::KING || to_bitboard(generate_legal_moves(turn_ + 1))[new_pos.to_index()]))
                     legal_moves.push_back(new_move);
                 if (piece != std::nullopt)
                     return;
@@ -364,18 +369,17 @@ namespace board
         return true;
     }
 
-    std::vector<Move> Chessboard::generate_legal_moves()
+    std::vector<Move> Chessboard::generate_legal_moves(const int &turn)
     {
         std::vector<Move> moves;
 
         for (int p = 0; p < 6; p++)
             for (int i = 0; i < 64; i++)
-                if (pieces_[static_cast<int>(side_turn_)][p][i])
+                if (pieces_[turn % 2][p][i])
                 {
                     Position position(i);
                     auto type = static_cast<PieceType>(p);
-                    auto color =
-                        static_cast<Color>(static_cast<int>(side_turn_));
+                    auto color = get_side_turn();
 
                     if (type == PieceType::PAWN)
                     {
@@ -401,6 +405,12 @@ namespace board
                 }
 
         return moves;
+    }
+
+    bool Chessboard::is_check(Color color)
+    {
+        (void) color;
+        return false;
     }
 } // namespace board
 

@@ -17,7 +17,7 @@ namespace board
         Chessboard();
         Chessboard(std::string string);
 
-        std::vector<Move> generate_legal_moves();
+        std::vector<Move> generate_legal_moves(const int &turn);
         bool is_move_legal(Move move);
 
         void update_piece(const int &color, const int &type,
@@ -25,9 +25,11 @@ namespace board
 
         void check_eating_en_passant(const Move &move);
         void do_move(Move move);
-        bool is_check();
+        bool is_check(Color color);
         bool is_checkmate();
         bool is_draw();
+
+        Color get_side_turn();
 
         std::pair<PieceType, Color> operator[](Position postion);
 
@@ -59,8 +61,7 @@ namespace board
         std::array<std::bitset<64>, 2> color_boards_;
         std::bitset<64> board_;
 
-        int turn_;
-        Color side_turn_ = Color::WHITE;
+        int turn_ = 0;
         bool white_turn_;
         bool white_king_castling_;
         bool white_queen_castling_;
