@@ -40,6 +40,7 @@ int main(int argc, const char *argv[])
 
             std::cout << "Pgn - " << file << " :\n";
             board->print_chessboard();
+
             // std::cout << "pgn: " << vm["pgn"].as<std::string>() << '\n';
         }
         else if (vm.count("listener"))
@@ -63,7 +64,9 @@ int main(int argc, const char *argv[])
                 board->do_move(board::Move(
                     static_cast<board::Color>(color), moves[0].get_piece(),
                     moves[0].get_start(), moves[0].get_end()));
+
                 color = !color;
+                board->is_check(static_cast<board::Color>(color));
             }
         }
     }

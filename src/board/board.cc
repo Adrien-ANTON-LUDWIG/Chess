@@ -1,5 +1,6 @@
 #include "board.hh"
 
+#include <cmath>
 #include <iostream>
 #include <string>
 
@@ -150,8 +151,8 @@ namespace board
         else
             en_passant_ = std::nullopt;
 
-        print_chessboard();
         turn_++;
+        print_chessboard();
     }
 
     // Return the color of the piece at position
@@ -320,7 +321,8 @@ namespace board
                 auto new_move =
                     Move(move.color_, move.piece_type_, move.start_, new_pos);
                 auto piece = is_piece_to_position(new_pos);
-                if (piece != move.color_ && (move.piece_type_ != PieceType::KING || to_bitboard(generate_legal_moves(turn_ + 1))[new_pos.to_index()]))
+
+                if (piece != move.color_)
                     legal_moves.push_back(new_move);
                 if (piece != std::nullopt)
                     return;
@@ -379,7 +381,7 @@ namespace board
                 {
                     Position position(i);
                     auto type = static_cast<PieceType>(p);
-                    auto color = get_side_turn();
+                    auto color = static_cast<Color>(turn % 2);
 
                     if (type == PieceType::PAWN)
                     {
@@ -407,9 +409,46 @@ namespace board
         return moves;
     }
 
-    bool Chessboard::is_check(Color color)
+    std::bitset<64>
+    Chessboard::generate_move_king_like_other(const PieceType &p,
+                                              const Color &c)
     {
-        (void) color;
+        Position king = Position(log2(pieces_[c][PieceType::KING].to_ullong()));
+
+        std::vector<Move> legal_moves;
+        if (p == PieceType::PAWN)
+            legal_moves = generate_legal_moves_pawn(king, c);
+        else if (p == PieceType::KNIGHT)
+            legal_moves = generate_legal_moves_knight(king, c);
+        else
+            legal_moves = generate_legal_moves_generic(king, c, p);
+
+        std::bitset<64> possible_moves;
+        for (auto move : legal_moves)
+            possible_moves[move.end_.to_index()] = 1;
+
+        return possible_moves;
+    }
+
+    bool Chessboard::is_king_collision(const PieceType &piecetype,
+                                       const Color &color)
+    {
+        std::bitset<64> movement =
+            generate_move_king_like_other(piecetype, color);
+        std::bitset<64> ennemy = pieces_[!color][piecetype];
+        std::bitset<64> collision = movement & ennemy;
+        return collision != 0;
+    }
+
+    bool Chessboard::is_check(const Color &color)
+    {
+        int i = 0;
+        while (i < 6)
+        {
+            if (is_king_collision(static_cast<PieceType>(i), color))
+                return true;
+            i++;
+        }
         return false;
     }
 } // namespace board

@@ -25,7 +25,7 @@ namespace board
 
         void check_eating_en_passant(const Move &move);
         void do_move(Move move);
-        bool is_check(Color color);
+        bool is_check(const Color &color);
         bool is_checkmate();
         bool is_draw();
 
@@ -54,6 +54,11 @@ namespace board
         std::vector<Move> generate_legal_moves_generic(const Position &position,
                                                        Color piece_color,
                                                        PieceType type);
+
+        std::bitset<64> generate_move_king_like_other(const PieceType &p,
+                                                      const Color &c);
+
+        bool is_king_collision(const PieceType &piecetype, const Color &color);
 
     private:
         // pieces_[Color][PieceType]
