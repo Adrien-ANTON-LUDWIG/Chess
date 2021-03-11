@@ -11,20 +11,22 @@
 
 namespace board
 {
+    class Move;
+
     class Chessboard
     {
     public:
         Chessboard();
         Chessboard(std::string string);
+        friend class Move;
 
-        std::vector<Move> generate_legal_moves(const int &turn);
+        std::vector<Move> generate_legal_moves(const Color &side_turn);
         bool is_move_legal(Move move);
 
         void update_piece(const int &color, const int &type,
                           const int &position, const bool &arrive);
 
         void check_eating_en_passant(const Move &move);
-        void do_move(Move move);
         bool is_check(const Color &color);
         bool is_checkmate();
         bool is_draw();
@@ -67,6 +69,7 @@ namespace board
         std::bitset<64> board_;
 
         int turn_ = 0;
+        Color side_turn_ = Color::WHITE;
         bool white_turn_;
         bool white_king_castling_;
         bool white_queen_castling_;

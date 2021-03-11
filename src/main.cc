@@ -2,15 +2,58 @@
 #include <iostream>
 
 #include "board.hh"
+#include "exceptional_move.hh"
 #include "move.hh"
 #include "pgn-parser.hh"
 
 namespace po = boost::program_options;
 
+void play_pgn_move(board::Chessboard &board, board::PgnMove &move, bool &color)
+{
+    if (move.get_piece() == board::PieceType::KING
+        && abs(move.get_start().file_get() - move.get_end().file_get()) == 2)
+        board::ExceptionalMove(static_cast<board::Color>(color),
+                               move.get_start(), move.get_end())
+            .execute_move(board);
+    else
+        board::Move(static_cast<board::Color>(color), move.get_piece(),
+                    move.get_start(), move.get_end())
+            .execute_move(board);
+    board.print_chessboard();
+    color = !color;
+}
+
+void play_pgn_game(const std::string &filename, board::Chessboard &board)
+{
+    auto moves = pgn_parser::parse_pgn(filename);
+    bool color = false;
+    for (auto move : moves)
+        play_pgn_move(board, move, color);
+
+    std::cout << "Pgn - " << filename << " :\n";
+    board.print_chessboard();
+}
+
+void interractive(board::Chessboard &board)
+{
+    bool color = false;
+
+    while (1)
+    {
+        std::vector<std::string> move_string = { "" };
+        std::cin >> move_string[0];
+
+        auto moves = pgn_parser::string_to_move(move_string);
+
+        play_pgn_move(board, moves[0], color);
+        board.is_check(static_cast<board::Color>(color));
+    }
+}
+
 int main(int argc, const char *argv[])
 {
-    board::Chessboard *board = new board::Chessboard();
-    board->print_chessboard();
+    board::Chessboard board;
+    board.print_chessboard();
     try
     {
         po::options_description desc{ "Options" };
@@ -26,23 +69,7 @@ int main(int argc, const char *argv[])
         po::notify(vm);
 
         if (vm.count("pgn"))
-        {
-            auto file = vm["pgn"].as<std::string>();
-            auto moves = pgn_parser::parse_pgn(file);
-            bool color = false;
-            for (auto move : moves)
-            {
-                board->do_move(board::Move(static_cast<board::Color>(color),
-                                           move.get_piece(), move.get_start(),
-                                           move.get_end()));
-                color = !color;
-            }
-
-            std::cout << "Pgn - " << file << " :\n";
-            board->print_chessboard();
-
-            // std::cout << "pgn: " << vm["pgn"].as<std::string>() << '\n';
-        }
+            play_pgn_game(vm["pgn"].as<std::string>(), board);
         else if (vm.count("listener"))
             std::cout << "listener: "
                       << (vm["listener"].as<std::vector<std::string>>()).size()
@@ -51,28 +78,10 @@ int main(int argc, const char *argv[])
             std::cout << "perft: " << vm["perft"].as<std::string>() << '\n';
 
         else if (vm.count("play"))
-        {
-            bool color = false;
-
-            while (1)
-            {
-                std::vector<std::string> move_string = { "" };
-                std::cin >> move_string[0];
-
-                auto moves = pgn_parser::string_to_move(move_string);
-
-                board->do_move(board::Move(
-                    static_cast<board::Color>(color), moves[0].get_piece(),
-                    moves[0].get_start(), moves[0].get_end()));
-
-                color = !color;
-                board->is_check(static_cast<board::Color>(color));
-            }
-        }
+            interractive(board);
     }
     catch (const po::error &e)
     {
         std::cerr << e.what() << '\n';
     }
-    delete board;
 }
