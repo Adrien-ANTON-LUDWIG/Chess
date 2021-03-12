@@ -14,6 +14,7 @@ set(SRC_ENGINE
     src/board/board.cc
     src/board/move.cc
     src/board/exceptional_move.cc
+    src/board/basic_move.cc
     src/pgn_parser/pgn-exception.cc
     src/pgn_parser/pgn-move.cc
     src/pgn_parser/pgn-parser.cc

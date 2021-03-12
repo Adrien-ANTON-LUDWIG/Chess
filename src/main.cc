@@ -1,7 +1,9 @@
 #include <boost/program_options.hpp>
 #include <iostream>
 
+#include "basic_move.hh"
 #include "board.hh"
+#include "color.hh"
 #include "exceptional_move.hh"
 #include "move.hh"
 #include "pgn-parser.hh"
@@ -12,14 +14,41 @@ void play_pgn_move(board::Chessboard &board, board::PgnMove &move, bool &color)
 {
     if (move.get_piece() == board::PieceType::KING
         && abs(move.get_start().file_get() - move.get_end().file_get()) == 2)
+    {
+        if (move.get_capture() || move.get_promotion() != std::nullopt)
+        {
+            std::cerr << "Log disqualification" << std::endl;
+            exit(0);
+        }
+
         board::ExceptionalMove(static_cast<board::Color>(color),
                                move.get_start(), move.get_end())
             .execute_move(board);
+    }
     else
-        board::Move(static_cast<board::Color>(color), move.get_piece(),
-                    move.get_start(), move.get_end())
-            .execute_move(board);
-    board.print_chessboard();
+    {
+        auto mv =
+            board::BasicMove(static_cast<board::Color>(color), move.get_piece(),
+                             move.get_start(), move.get_end());
+
+        if (move.get_capture())
+            if (!mv.set_capture(board))
+            {
+                std::cerr << "Log disqualification" << std::endl;
+                exit(0);
+            }
+
+        auto promotion = move.get_promotion();
+        if (promotion != std::nullopt)
+            if (mv.set_promotion(promotion))
+            {
+                std::cerr << "Log disqualification" << std::endl;
+                exit(0);
+            }
+
+        mv.execute_move(board);
+    }
+    board.print_chessboard(static_cast<board::Color>(color));
     color = !color;
 }
 
@@ -31,7 +60,7 @@ void play_pgn_game(const std::string &filename, board::Chessboard &board)
         play_pgn_move(board, move, color);
 
     std::cout << "Pgn - " << filename << " :\n";
-    board.print_chessboard();
+    board.print_chessboard(static_cast<board::Color>(color));
 }
 
 void interractive(board::Chessboard &board)
@@ -53,7 +82,7 @@ void interractive(board::Chessboard &board)
 int main(int argc, const char *argv[])
 {
     board::Chessboard board;
-    board.print_chessboard();
+    board.print_chessboard(board::Color::WHITE);
     try
     {
         po::options_description desc{ "Options" };

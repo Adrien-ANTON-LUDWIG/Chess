@@ -16,10 +16,12 @@ namespace board
     {
     public:
         friend std::bitset<64> to_bitboard(const std::vector<Move> &moves);
+
         Move(const Color &color, const PieceType &piece_type,
              const Position &start, const Position &end);
+        Move() = default;
 
-        void execute_move(Chessboard &board);
+        virtual void execute_move(Chessboard &board) = 0;
 
         Color color_;
         PieceType piece_type_;

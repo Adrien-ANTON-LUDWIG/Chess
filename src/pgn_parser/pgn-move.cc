@@ -64,4 +64,14 @@ namespace board
         return end_;
     }
 
+    PgnMove::opt_piece_t PgnMove::get_promotion()
+    {
+        return promotion_;
+    }
+
+    bool PgnMove::get_capture()
+    {
+        return capture_;
+    }
+
 } // namespace board

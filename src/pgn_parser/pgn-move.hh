@@ -30,6 +30,8 @@ namespace board
         PieceType get_piece();
         const Position get_start();
         const Position get_end();
+        opt_piece_t get_promotion();
+        bool get_capture();
 
     private:
         // The original position of the piece

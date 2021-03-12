@@ -4,38 +4,18 @@
 
 namespace board
 {
-    enum class ExceptionalMoveType
-    {
-        CASTLING_SMALL,
-        CASTLING_BIG
-    };
+    class Chessboard;
 
     class ExceptionalMove : public Move
     {
     public:
         ExceptionalMove(const Color &color, const Position &start,
-                        const Position &end)
-            : Move(color, PieceType::KING, start, end)
-        {
-            if (start.file_get() < end.file_get())
-            {
-                move_type_ = ExceptionalMoveType::CASTLING_SMALL;
-                if (color == Color::WHITE)
-                    end_ = Position(File::H, Rank::ONE);
-                else
-                    end_ = Position(File::H, Rank::EIGHT);
-            }
-            else
-            {
-                move_type_ = ExceptionalMoveType::CASTLING_BIG;
-                if (color == Color::WHITE)
-                    end_ = Position(File::A, Rank::ONE);
-                else
-                    end_ = Position(File::A, Rank::EIGHT);
-            }
-        }
+                        const Position &end);
 
-        void execute_move(Chessboard &board);
+        ExceptionalMove(const Color &color,
+                        const ExceptionalMoveType &castling_type);
+
+        void execute_move(Chessboard &board) override;
 
     private:
         ExceptionalMoveType move_type_;
