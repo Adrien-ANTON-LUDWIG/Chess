@@ -74,4 +74,8 @@ namespace board
         return capture_;
     }
 
+    ReportType PgnMove::get_report()
+    {
+        return report_;
+    }
 } // namespace board

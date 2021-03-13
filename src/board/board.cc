@@ -4,9 +4,6 @@
 #include <iostream>
 #include <string>
 
-#include "basic_move.hh"
-#include "exceptional_move.hh"
-
 namespace board
 {
     Chessboard::Chessboard()
@@ -163,7 +160,7 @@ namespace board
                 continue;
 
             int j = 3 - abs(i);
-            for (int k = 0; k < 2; k++)
+            for (int k = 0; k < 2; k++, j = -j)
             {
                 if (i == 0 && j == 0)
                     continue;
@@ -172,19 +169,17 @@ namespace board
                 auto file_int = static_cast<int>(file) + j;
 
                 if (rank_int < 0 || rank_int > 7 || file_int < 0
-                    || file_int > 7) // Add vérif case pas en échec
+                    || file_int > 7)
                     continue;
 
                 auto new_rank = static_cast<Rank>(rank_int);
                 auto new_file = static_cast<File>(file_int);
-                Position move(new_file, new_rank);
-                auto move_color = is_piece_to_position(move);
-                if (move_color == std::nullopt
-                    || move_color != color) // Add vérif case pas en échec
-                    moves.push_back(
-                        BasicMove(color, PieceType::KNIGHT, position, move));
-
-                j = -j;
+                Position pos(new_file, new_rank);
+                auto move_color = is_piece_to_position(pos);
+                auto mv = Move(color, PieceType::KNIGHT, position, pos);
+                mv.set_capture(*this);
+                if (move_color == std::nullopt || move_color != color)
+                    moves.push_back(mv);
             }
         }
         return moves;
@@ -197,6 +192,29 @@ namespace board
         return a;
     }
 
+    void Chessboard::generate_pawn_capture(std::vector<Move> &moves,
+                                           const Position &position,
+                                           const Color &color,
+                                           const int &color_side,
+                                           const File &file, const int &side)
+    {
+        if (position.file_get() != file)
+        {
+            Position capture1(
+                static_cast<File>(static_cast<int>(position.file_get()) + side),
+                static_cast<Rank>(static_cast<int>(position.rank_get())
+                                  + 1 * color_side));
+            auto capture1_color = is_piece_to_position(capture1);
+
+            if (capture1_color != std::nullopt && capture1_color != color)
+            {
+                auto mv = Move(color, PieceType::PAWN, position, capture1);
+                mv.set_capture(*this);
+                moves.push_back(mv);
+            }
+        }
+    }
+
     // Generate a vector of all legal moves
     std::vector<Move>
     Chessboard::generate_legal_moves_pawn(const Position &position,
@@ -204,6 +222,7 @@ namespace board
     {
         std::vector<Move> moves;
         static std::array pawns_rank = { Rank::TWO, Rank::SEVEN };
+        static std::array promotion_rank = { Rank::EIGHT, Rank::ONE };
         int color_int = static_cast<int>(color);
         int side = opposite_number(1, color_int);
 
@@ -211,38 +230,18 @@ namespace board
         if (en_passant_ != std::nullopt
             && en_passant_->rank_get() == position.rank_get()
             && abs(en_passant_->file_get() - position.file_get()) == 1)
-            moves.push_back(
-                BasicMove(color, PieceType::PAWN, position,
-                          Position(en_passant_->file_get(),
-                                   static_cast<Rank>(en_passant_->rank_get()
-                                                     + 1 * side))));
+        {
+            auto mv = Move(color, PieceType::PAWN, position,
+                           Position(en_passant_->file_get(),
+                                    static_cast<Rank>(en_passant_->rank_get()
+                                                      + 1 * side)));
+            mv.set_capture(*this);
+            moves.push_back(mv);
+        }
 
         // Capture
-        if (position.file_get() != File::A)
-        {
-            Position capture1(
-                static_cast<File>(static_cast<int>(position.file_get()) - 1),
-                static_cast<Rank>(static_cast<int>(position.rank_get())
-                                  + 1 * side));
-            auto capture1_color = is_piece_to_position(capture1);
-
-            if (capture1_color != std::nullopt && capture1_color != color)
-                moves.push_back(
-                    BasicMove(color, PieceType::PAWN, position, capture1));
-        }
-
-        if (position.file_get() != File::H)
-        {
-            Position capture2(
-                static_cast<File>(static_cast<int>(position.file_get()) + 1),
-                static_cast<Rank>(static_cast<int>(position.rank_get())
-                                  + 1 * side));
-            auto capture2_color = is_piece_to_position(capture2);
-
-            if (capture2_color != std::nullopt && capture2_color != color)
-                moves.push_back(
-                    BasicMove(color, PieceType::PAWN, position, capture2));
-        }
+        generate_pawn_capture(moves, position, color, side, File::A, -1);
+        generate_pawn_capture(moves, position, color, side, File::H, 1);
 
         // Move front
         Position front(position.file_get(),
@@ -254,7 +253,13 @@ namespace board
         if (front_color != std::nullopt)
             return moves;
 
-        moves.push_back(BasicMove(color, PieceType::PAWN, position, front));
+        auto mv = Move(color, PieceType::PAWN, position, front);
+
+        // Promotion
+        if (front.rank_get() == promotion_rank[color])
+            mv.set_promotion(PieceType::QUEEN);
+
+        moves.push_back(mv);
 
         if (position.rank_get() != pawns_rank[color_int])
             return moves;
@@ -268,7 +273,7 @@ namespace board
         if (front2_color != std::nullopt)
             return moves;
 
-        moves.push_back(BasicMove(color, PieceType::PAWN, position, front2));
+        moves.push_back(Move(color, PieceType::PAWN, position, front2));
         return moves;
     }
 
@@ -302,8 +307,9 @@ namespace board
             {
                 auto new_pos = Position(static_cast<File>(new_x),
                                         static_cast<Rank>(new_y));
-                auto new_move = BasicMove(move.color_, move.piece_type_,
-                                          move.start_, new_pos);
+                auto new_move =
+                    Move(move.color_, move.piece_type_, move.start_, new_pos);
+                new_move.set_capture(*this);
                 auto piece = is_piece_to_position(new_pos);
 
                 if (piece != move.color_)
@@ -340,7 +346,7 @@ namespace board
         int distance = distances[static_cast<int>(type)];
         bool diagonal = diagonals[static_cast<int>(type)];
 
-        BasicMove m = BasicMove(piece_color, type, position, position);
+        Move m = Move(piece_color, type, position, position);
         std::vector<Move> vec = std::vector<Move>();
         if (forward)
             generate_legal_moves_forward(m, distance, vec);
@@ -356,22 +362,21 @@ namespace board
     }
 
     bool Chessboard::is_castling_legal(const Color &side_turn,
-                                       const ExceptionalMoveType &castling_type)
+                                       const Castling &castling_type)
     {
         static std::array<Position, 2> king_pos = {
             Position(File::E, Rank::ONE), Position(File::E, Rank::EIGHT)
         };
-        int side =
-            (castling_type == ExceptionalMoveType::CASTLING_SMALL) ? -1 : 1;
+        int side = (castling_type == Castling::SMALL) ? 1 : -1;
 
         for (int i = 1; i < 3; i++)
         {
             Chessboard fake_board(*this);
-            BasicMove tmp = BasicMove(
-                side_turn, PieceType::KING, king_pos[side_turn],
-                Position(king_pos[side_turn].file_get(),
-                         static_cast<Rank>(king_pos[side_turn].rank_get()
-                                           + i * side)));
+            Move tmp =
+                Move(side_turn, PieceType::KING, king_pos[side_turn],
+                     Position(static_cast<File>(king_pos[side_turn].file_get()
+                                                + i * side),
+                              king_pos[side_turn].rank_get()));
             tmp.execute_move(fake_board);
             if (is_check(side_turn))
                 return false;
@@ -393,17 +398,14 @@ namespace board
             return castling_moves;
 
         if (king_castling_[side_turn] && (board_ & kc_mask[side_turn]) == 0
-            && is_castling_legal(side_turn,
-                                 ExceptionalMoveType::CASTLING_SMALL))
+            && is_castling_legal(side_turn, Castling::SMALL))
         {
-            castling_moves.push_back(ExceptionalMove(
-                side_turn, ExceptionalMoveType::CASTLING_SMALL));
+            castling_moves.push_back(Move(side_turn, Castling::SMALL));
         }
         if (queen_castling_[side_turn] && (board_ & qc_mask[side_turn]) == 0
-            && is_castling_legal(side_turn, ExceptionalMoveType::CASTLING_BIG))
+            && is_castling_legal(side_turn, Castling::BIG))
         {
-            castling_moves.push_back(
-                ExceptionalMove(side_turn, ExceptionalMoveType::CASTLING_BIG));
+            castling_moves.push_back(Move(side_turn, Castling::BIG));
         }
 
         return castling_moves;
@@ -505,6 +507,11 @@ namespace board
             i++;
         }
         return false;
+    }
+
+    bool Chessboard::is_checkmate(const Color &color)
+    {
+        return is_check(color) && generate_legal_moves(color).size() == 0;
     }
 } // namespace board
 

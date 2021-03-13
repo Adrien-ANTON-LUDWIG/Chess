@@ -1,12 +1,12 @@
+#include <algorithm>
 #include <boost/program_options.hpp>
 #include <iostream>
 
-#include "basic_move.hh"
 #include "board.hh"
 #include "color.hh"
-#include "exceptional_move.hh"
 #include "move.hh"
 #include "pgn-parser.hh"
+#include "piece-type.hh"
 
 namespace po = boost::program_options;
 
@@ -17,39 +17,70 @@ void play_pgn_move(board::Chessboard &board, board::PgnMove &move, bool &color)
     {
         if (move.get_capture() || move.get_promotion() != std::nullopt)
         {
-            std::cerr << "Log disqualification" << std::endl;
+            std::cerr << "Disqualification" << std::endl;
             exit(0);
         }
 
-        board::ExceptionalMove(static_cast<board::Color>(color),
-                               move.get_start(), move.get_end())
-            .execute_move(board);
+        auto mv = board::Move(static_cast<board::Color>(color),
+                              move.get_start(), move.get_end());
+
+        auto legal_moves =
+            board.generate_legal_moves(static_cast<board::Color>(color));
+        if (std::find(legal_moves.begin(), legal_moves.end(), mv)
+            == legal_moves.end())
+        {
+            std::cerr << "Disqualification" << std::endl;
+            exit(0);
+        }
+
+        mv.execute_move(board);
     }
     else
     {
         auto mv =
-            board::BasicMove(static_cast<board::Color>(color), move.get_piece(),
-                             move.get_start(), move.get_end());
+            board::Move(static_cast<board::Color>(color), move.get_piece(),
+                        move.get_start(), move.get_end());
 
         if (move.get_capture())
             if (!mv.set_capture(board))
             {
-                std::cerr << "Log disqualification" << std::endl;
+                std::cerr << "Disqualification" << std::endl;
                 exit(0);
             }
 
         auto promotion = move.get_promotion();
         if (promotion != std::nullopt)
-            if (mv.set_promotion(promotion))
+            if (!mv.set_promotion(*promotion))
             {
-                std::cerr << "Log disqualification" << std::endl;
+                std::cerr << "Disqualification" << std::endl;
                 exit(0);
             }
 
+        auto legal_moves =
+            board.generate_legal_moves(static_cast<board::Color>(color));
+        if (std::find(legal_moves.begin(), legal_moves.end(), mv)
+            == legal_moves.end())
+        {
+            std::cerr << "Disqualification" << std::endl;
+            exit(0);
+        }
+
         mv.execute_move(board);
     }
-    board.print_chessboard(static_cast<board::Color>(color));
+
+    if ((move.get_report() == ReportType::CHECK
+         && !board.is_check(static_cast<board::Color>(!color)))
+        || (move.get_report() == ReportType::CHECKMATE
+            && !board.is_checkmate(static_cast<board::Color>(!color)))
+        || (move.get_report() == ReportType::NONE
+            && (board.is_check(static_cast<board::Color>(!color)))))
+    {
+        std::cerr << "Disqualification" << std::endl;
+        exit(0);
+    }
+
     color = !color;
+    board.print_chessboard(static_cast<board::Color>(color));
 }
 
 void play_pgn_game(const std::string &filename, board::Chessboard &board)

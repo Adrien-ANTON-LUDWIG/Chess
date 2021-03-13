@@ -32,6 +32,7 @@ namespace board
         const Position get_end();
         opt_piece_t get_promotion();
         bool get_capture();
+        ReportType get_report();
 
     private:
         // The original position of the piece

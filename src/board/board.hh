@@ -4,8 +4,8 @@
 #include <map>
 #include <vector>
 
+#include "castling_type.hh"
 #include "color.hh"
-#include "exceptional_move_type.hh"
 #include "move.hh"
 #include "piece-type.hh"
 #include "position.hh"
@@ -20,8 +20,6 @@ namespace board
         Chessboard();
         Chessboard(std::string string);
         friend class Move;
-        friend class ExceptionalMove;
-        friend class BasicMove;
 
         std::vector<Move> generate_legal_moves(const Color &side_turn);
         bool is_move_legal(const Move &move);
@@ -32,7 +30,7 @@ namespace board
         bool check_eating_en_passant(const Move &move);
         void update_en_passant(const Move &move);
         bool is_check(const Color &color);
-        bool is_checkmate();
+        bool is_checkmate(const Color &color);
         bool is_draw();
 
         Color get_side_turn();
@@ -45,6 +43,12 @@ namespace board
 
         std::vector<Move> generate_legal_moves_knight(const Position &position,
                                                       const Color &color);
+
+        void generate_pawn_capture(std::vector<Move> &moves,
+                                   const Position &position, const Color &color,
+                                   const int &color_side, const File &file,
+                                   const int &side);
+
         std::vector<Move> generate_legal_moves_pawn(const Position &position,
                                                     const Color &color);
 
@@ -68,7 +72,7 @@ namespace board
 
         bool is_king_collision(const PieceType &piecetype, const Color &color);
         bool is_castling_legal(const Color &side_turn,
-                               const ExceptionalMoveType &castling_type);
+                               const Castling &castling_type);
 
     private:
         // pieces_[Color][PieceType]
