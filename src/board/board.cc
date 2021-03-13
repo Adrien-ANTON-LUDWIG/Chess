@@ -198,18 +198,25 @@ namespace board
                                            const int &color_side,
                                            const File &file, const int &side)
     {
+        static std::array promotion_rank = { Rank::EIGHT, Rank::ONE };
+
         if (position.file_get() != file)
         {
-            Position capture1(
+            Position capture(
                 static_cast<File>(static_cast<int>(position.file_get()) + side),
                 static_cast<Rank>(static_cast<int>(position.rank_get())
                                   + 1 * color_side));
-            auto capture1_color = is_piece_to_position(capture1);
+            auto capture_color = is_piece_to_position(capture);
 
-            if (capture1_color != std::nullopt && capture1_color != color)
+            if (capture_color != std::nullopt && capture_color != color)
             {
-                auto mv = Move(color, PieceType::PAWN, position, capture1);
+                auto mv = Move(color, PieceType::PAWN, position, capture);
                 mv.set_capture(*this);
+
+                // Promotion
+                if (capture.rank_get() == promotion_rank[color])
+                    mv.set_promotion(PieceType::QUEEN);
+
                 moves.push_back(mv);
             }
         }
