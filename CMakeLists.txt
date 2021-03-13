@@ -16,9 +16,9 @@ set(SRC_ENGINE
     src/pgn_parser/pgn-exception.cc
     src/pgn_parser/pgn-move.cc
     src/pgn_parser/pgn-parser.cc
+    src/pieces/position.cc
     src/uci/uci-time.cc
     src/uci/uci.cc
-    src/main.cc
 )
 
 # Directories containing headers must be specified in the include_directories()
