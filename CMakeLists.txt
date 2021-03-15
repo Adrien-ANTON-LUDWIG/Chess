@@ -20,6 +20,7 @@ set(SRC_ENGINE
     src/pieces/position.cc
     src/uci/uci-time.cc
     src/uci/uci.cc
+    src/perft/perft.cc
 )
 
 # Directories containing headers must be specified in the include_directories()
@@ -31,6 +32,7 @@ include_directories(
     "src/pgn_parser"
     "src/pieces"
     "src/uci"
+    "src/perft"
 )
 
 # Put your test files here

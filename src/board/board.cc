@@ -6,8 +6,14 @@
 
 namespace board
 {
-    Chessboard::Chessboard()
+    Chessboard::Chessboard(bool empty)
     {
+        if (empty)
+        {
+            king_castling_ = { false, false };
+            queen_castling_ = { false, false };
+            return;
+        }
         pieces_[static_cast<int>(Color::WHITE)]
                [static_cast<int>(PieceType::QUEEN)] = 0x0000000000000010;
         pieces_[static_cast<int>(Color::WHITE)]
@@ -92,17 +98,30 @@ namespace board
         return;
     }
 
+    Color Chessboard::get_side_turn()
+    {
+        return static_cast<Color>(turn_ % 2);
+    }
+
+    void Chessboard::set_castling(Color color, PieceType type)
+    {
+        if (type == PieceType::KING)
+            king_castling_[color] = true;
+        else
+            queen_castling_[color] = true;
+    }
+
+    void Chessboard::set_en_passant(Position pos)
+    {
+        en_passant_ = pos;
+    }
+
     void Chessboard::update_piece(const int &color, const int &type,
                                   const int &position, const bool &arrive)
     {
         pieces_[color][type][position] = arrive;
         color_boards_[color][position] = arrive;
         board_[position] = arrive;
-    }
-
-    Color Chessboard::get_side_turn()
-    {
-        return static_cast<Color>(turn_ % 2);
     }
 
     bool Chessboard::check_eating_en_passant(const Move &move)
