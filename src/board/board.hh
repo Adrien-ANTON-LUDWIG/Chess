@@ -17,7 +17,7 @@ namespace board
     class Chessboard
     {
     public:
-        Chessboard();
+        Chessboard(bool empty = false);
         Chessboard(std::string string);
         friend class Move;
 
@@ -32,8 +32,6 @@ namespace board
         bool is_check(const Color &color);
         bool is_checkmate(const Color &color);
         bool is_draw();
-
-        Color get_side_turn();
 
         std::pair<PieceType, Color> operator[](Position postion);
 
@@ -73,6 +71,9 @@ namespace board
         bool is_king_collision(const PieceType &piecetype, const Color &color);
         bool is_castling_legal(const Color &side_turn,
                                const Castling &castling_type);
+        void set_castling(Color color, PieceType type);
+        void set_en_passant(Position pos);
+        Color get_side_turn();
 
     private:
         // pieces_[Color][PieceType]
