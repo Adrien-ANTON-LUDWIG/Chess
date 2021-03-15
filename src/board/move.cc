@@ -162,10 +162,17 @@ namespace board
         }
 
         if (board.color_boards_[color_][end])
+        {
+            board.print_chessboard(color_);
             throw std::logic_error(
                 "There should not be 2 pieces at the position, color : "
                 + std::to_string(color_)
-                + ", piece : " + std::to_string(piece_type_));
+                + ", piece : " + std::to_string(piece_type_) + ", start : ("
+                + std::to_string(start_.file_get() + 'A') + ", "
+                + std::to_string(start_.rank_get())
+                + "), end : " + std::to_string(end_.file_get() + 'A') + ", "
+                + std::to_string(end_.rank_get()) + ")");
+        }
         if (piece_type_ == PieceType::PAWN)
             board.last_fifty_turn_ = 0;
         if (promotion_)

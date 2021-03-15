@@ -22,8 +22,6 @@ namespace board
 
         friend class Move;
 
-        Chessboard();
-
         std::vector<Move> generate_legal_moves(const Color &side_turn);
         bool is_move_legal(const Move &move);
 

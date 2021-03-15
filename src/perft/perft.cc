@@ -132,7 +132,7 @@ board::Chessboard init_board_from_perft(std::string perft_string)
                 type = board::PieceType::QUEEN;
             else if (tolower(perft_string[i]) == 'k')
                 type = board::PieceType::KING;
-            else if (tolower(perft_string[i]) == 'p')
+            else
                 type = board::PieceType::PAWN;
             b.update_piece(color, type, pos, 1);
             pos--;

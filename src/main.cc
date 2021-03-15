@@ -5,6 +5,7 @@
 #include "color.hh"
 #include "game-tracer.hh"
 #include "move.hh"
+#include "perft.hh"
 #include "pgn-parser.hh"
 #include "piece-type.hh"
 
@@ -40,7 +41,8 @@ int main(int argc, const char *argv[])
         if (vm.count("pgn"))
             game_tracer.play_pgn_game();
         else if (vm.count("perft"))
-            std::cout << "perft: " << vm["perft"].as<std::string>() << '\n';
+            std::cout << run_from_perft(vm["perft"].as<std::string>())
+                      << std::endl;
         else if (vm.count("play"))
             game_tracer.interractive();
     }
