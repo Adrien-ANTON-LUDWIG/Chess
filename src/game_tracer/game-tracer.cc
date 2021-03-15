@@ -125,7 +125,7 @@ namespace board
                 l->on_piece_moved(mv.piece_type_, mv.start_, mv.end_);
 
                 if (mv.capture_ != std::nullopt)
-                    l->on_piece_taken(mv.capture_->first, mv.capture_->second);
+                    l->on_piece_taken(mv.capture_->first, mv.end_);
 
                 if (mv.promotion_)
                     l->on_piece_promoted(mv.promotion_type_, mv.end_);
@@ -168,6 +168,7 @@ namespace board
             for (auto l : listeners_)
             {
                 l->on_player_pat(static_cast<Color>(!color));
+                l->on_draw();
                 l->on_game_finished();
             }
 

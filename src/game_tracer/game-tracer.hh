@@ -24,7 +24,7 @@ namespace board
     private:
         Chessboard board_;
         std::string pgn_filepath_;
-        std::vector<Listener*> listeners_;
+        std::vector<Listener *> listeners_;
 
         // History
         std::vector<Chessboard> history_;
