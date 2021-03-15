@@ -166,6 +166,8 @@ namespace board
                 "There should not be 2 pieces at the position, color : "
                 + std::to_string(color_)
                 + ", piece : " + std::to_string(piece_type_));
+        if (piece_type_ == PieceType::PAWN)
+            board.last_fifty_turn_ = 0;
         if (promotion_)
             type = promotion_type_;
         board.update_piece(color, type, end, 1);

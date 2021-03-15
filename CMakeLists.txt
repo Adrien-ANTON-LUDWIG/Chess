@@ -4,7 +4,7 @@
 # set(MYVAR "val1" "val2") creates a list
 
 set(OPT_FLAGS
-    "-Wall -Wextra -Werror -pedantic -std=c++17 -g"
+    "-Wall -Wextra -Werror -pedantic -std=c++17 -g -ldl"
 )
 
 # END OPTIMIZATION FLAGS
@@ -13,6 +13,7 @@ set(OPT_FLAGS
 set(SRC_ENGINE
     src/board/board.cc
     src/board/move.cc
+    src/game_tracer/game-tracer.cc
     src/pgn_parser/pgn-exception.cc
     src/pgn_parser/pgn-move.cc
     src/pgn_parser/pgn-parser.cc
@@ -24,6 +25,7 @@ set(SRC_ENGINE
 # Directories containing headers must be specified in the include_directories()
 include_directories(
     "src/board"
+    "src/game_tracer"
     "src/listener"
     "src/misc"
     "src/pgn_parser"

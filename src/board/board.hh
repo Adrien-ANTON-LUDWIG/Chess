@@ -17,9 +17,9 @@ namespace board
     class Chessboard
     {
     public:
-        Chessboard();
-        Chessboard(std::string string);
         friend class Move;
+
+        Chessboard();
 
         std::vector<Move> generate_legal_moves(const Color &side_turn);
         bool is_move_legal(const Move &move);
@@ -31,6 +31,7 @@ namespace board
         void update_en_passant(const Move &move);
         bool is_check(const Color &color);
         bool is_checkmate(const Color &color);
+        bool is_stalemate(const Color &color);
         bool is_draw();
 
         Color get_side_turn();
@@ -74,6 +75,8 @@ namespace board
         bool is_castling_legal(const Color &side_turn,
                                const Castling &castling_type);
 
+        bool is_equivalent(const Chessboard &other);
+
     private:
         // pieces_[Color][PieceType]
         std::array<std::array<std::bitset<64>, 6>, 2> pieces_;
@@ -88,6 +91,6 @@ namespace board
         std::array<bool, 2> king_castling_ = { true, true };
         std::array<bool, 2> queen_castling_ = { true, true };
         std::optional<Position> en_passant_ = std::nullopt;
-        int last_fifty_turn_;
+        int last_fifty_turn_ = 0;
     };
 } // namespace board
