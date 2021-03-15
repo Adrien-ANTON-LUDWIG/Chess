@@ -539,6 +539,21 @@ namespace board
     {
         return is_check(color) && generate_legal_moves(color).size() == 0;
     }
+
+    bool Chessboard::is_stalemate(const Color &color)
+    {
+        return !is_check(color) && generate_legal_moves(color).size() == 0;
+    }
+
+    bool Chessboard::is_draw()
+    {
+        return last_fifty_turn_ >= 50;
+    }
+
+    bool Chessboard::is_equivalent(const Chessboard &other)
+    {
+        return pieces_ == other.pieces_;
+    }
 } // namespace board
 
 /*

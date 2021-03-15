@@ -17,6 +17,7 @@ namespace board
     {
     public:
         friend class Chessboard;
+        friend class GameTracer;
         friend std::bitset<64> to_bitboard(const std::vector<Move> &moves);
 
         Move() = default;
@@ -44,13 +45,11 @@ namespace board
         Position end_;
 
         // Basique
-        // 🇫🇷🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖
         std::optional<std::pair<PieceType, Position>> capture_ = std::nullopt;
         bool promotion_ = false;
         PieceType promotion_type_ = PieceType::QUEEN;
 
         // Roque
-        // 🇫🇷🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖🥖
         bool castling_ = false;
         Castling move_type_ = Castling::SMALL;
     };
