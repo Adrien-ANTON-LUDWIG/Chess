@@ -43,26 +43,20 @@ int start_game_perft(board::Chessboard board, int &white_cpt, int &black_cpt,
                      int depth, board::Color side_turn)
 {
     if (!depth)
-        return 0;
+        return 1;
     int nodes = 0;
     auto moves = board.generate_legal_moves(side_turn);
     for (size_t i = 0; i < moves.size(); i++)
     {
-        auto plateau_de_merde_de_taureau = board::Chessboard(board);
-        moves[i].execute_move(plateau_de_merde_de_taureau);
-        nodes++;
+        auto temp_board = board::Chessboard(board);
+        moves[i].execute_move(temp_board);
         if (side_turn == board::Color::WHITE)
-        {
             white_cpt++;
-            side_turn = board::Color::BLACK;
-        }
         else
-        {
             black_cpt++;
-            side_turn = board::Color::WHITE;
-        }
-        nodes += start_game_perft(plateau_de_merde_de_taureau, white_cpt,
-                                  black_cpt, depth - 1, side_turn);
+        nodes += start_game_perft(
+            temp_board, white_cpt, black_cpt, depth - 1,
+            static_cast<board::Color>(!static_cast<int>(side_turn)));
     }
     return nodes;
 }
