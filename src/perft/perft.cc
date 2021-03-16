@@ -48,7 +48,7 @@ int start_game_perft(board::Chessboard board, int &white_cpt, int &black_cpt,
         return 1;
     int nodes = 0;
     auto moves = board.generate_legal_moves(side_turn);
-    // board.print_chessboard(side_turn);
+    // std::cout << board.to_fen() << " " << depth << "\n";
     // std::cout << "Legal moves: " << moves.size() << "\n";
     // std::cout << "Depth value: " << depth << "\n";
     for (size_t i = 0; i < moves.size(); i++)
@@ -59,13 +59,23 @@ int start_game_perft(board::Chessboard board, int &white_cpt, int &black_cpt,
             white_cpt++;
         else
             black_cpt++;
+        /*
+        // if (34 <= i && i <= 37 && side_turn == board::Color::WHITE)
+        {
+            std::cout << "\n---\n";
+            board.print_chessboard(side_turn);
+            temp_board.print_chessboard(side_turn);
+            std::cout << moves[i];
+            std::string unused;
+            std::cin >> unused;
+        }
+        */
         nodes += start_game_perft(
             temp_board, white_cpt, black_cpt, depth - 1,
             static_cast<board::Color>(!static_cast<int>(side_turn)));
     }
     return nodes;
 }
-
 // rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1 1
 
 void configurer_roque(std::string perft_string, board::Chessboard &board)

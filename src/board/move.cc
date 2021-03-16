@@ -244,4 +244,14 @@ namespace board
             && promotion_ == o.promotion_ && castling_ == o.castling_
             && move_type_ == o.move_type_;
     }
+
+    void operator<<(std::ostream &o, const Move &move)
+    {
+        o << "Move -> Color : " + std::to_string(move.color_)
+                + ", piece : " + std::to_string(move.piece_type_)
+                + ", start : (" + std::to_string(move.start_.file_get()) + ", "
+                + std::to_string(move.start_.rank_get())
+                + "), end : " + std::to_string(move.end_.file_get()) + ", "
+                + std::to_string(move.end_.rank_get()) + ")\n";
+    }
 } // namespace board

@@ -408,7 +408,7 @@ namespace board
                                                 + i * side),
                               king_pos[side_turn].rank_get()));
             tmp.execute_move(fake_board);
-            if (is_check(side_turn))
+            if (fake_board.is_check(side_turn))
                 return false;
         }
 
@@ -558,7 +558,81 @@ namespace board
     {
         return pieces_ == other.pieces_;
     }
+
+    std::string Chessboard::to_fen()
+    {
+        static std::string characters[] = { "Q", "R", "B", "N", "P", "K",
+                                            "q", "r", "b", "n", "p", "k" };
+        std::string fen;
+
+        for (ssize_t i = 7; i >= 0; i--)
+        {
+            size_t empty = 0;
+            for (ssize_t j = 7; j >= 0; j--)
+            {
+                bool found = false;
+
+                for (size_t c = 0; c < 2; c++)
+                {
+                    for (size_t p = 0; p < 6; p++)
+                    {
+                        size_t index = i * 8 + j;
+                        if (pieces_[c][p][index])
+                        {
+                            found = true;
+                            if (empty)
+                                fen += std::to_string(empty);
+                            empty = 0;
+                            fen += characters[c * 6 + p];
+                        }
+                    }
+                }
+                if (!found)
+                    empty++;
+            }
+
+            if (empty)
+                fen += std::to_string(empty);
+            empty = 0;
+            if (i)
+            {
+                fen += '/';
+            }
+        }
+
+        fen += ' ';
+        if (side_turn_ == Color::WHITE)
+            fen += "w ";
+        else
+            fen += "b ";
+
+        if (king_castling_[Color::WHITE])
+            fen += "K";
+        if (queen_castling_[Color::BLACK])
+            fen += "Q";
+        if (king_castling_[Color::WHITE])
+            fen += "k";
+        if (queen_castling_[Color::BLACK])
+            fen += "q";
+
+        fen += ' ';
+
+        if (en_passant_ == std::nullopt)
+            fen += "- ";
+        else
+        {
+            fen += static_cast<int>(en_passant_->file_get()) + 'a';
+            fen += static_cast<int>(en_passant_->rank_get()) + '1';
+            fen += " ";
+        }
+
+        fen += "0 1";
+        return fen;
+    }
+
 } // namespace board
+
+// rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1 1
 
 /*
 8 | 63 62 61 60 59 58 57 56

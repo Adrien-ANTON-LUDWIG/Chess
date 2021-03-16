@@ -1,6 +1,7 @@
 #pragma once
 
 #include <bitset>
+#include <iostream>
 #include <vector>
 
 #include "board.hh"
@@ -18,6 +19,7 @@ namespace board
     public:
         friend class Chessboard;
         friend class GameTracer;
+        friend void operator<<(std::ostream &o, const Move &move);
         friend std::bitset<64> to_bitboard(const std::vector<Move> &moves);
 
         Move() = default;
@@ -54,5 +56,6 @@ namespace board
         Castling move_type_ = Castling::SMALL;
     };
 
+    void operator<<(std::ostream &o, const Move &move);
     std::bitset<64> to_bitboard(const std::vector<Move> &moves);
 } // namespace board

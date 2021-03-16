@@ -80,6 +80,7 @@ namespace board
         Color get_side_turn();
 
         bool is_equivalent(const Chessboard &other);
+        std::string to_fen();
 
     private:
         // pieces_[Color][PieceType]
