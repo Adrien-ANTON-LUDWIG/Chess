@@ -21,7 +21,7 @@ int run_from_perft(std::string perft_file)
         line = "";
 
         file >> line;
-        set_enpassant(line, board);
+        set_enpassant(line, board, side_turn);
         line = "";
 
         file >> line;
@@ -39,6 +39,8 @@ int run_from_perft(std::string perft_file)
     return 0;
 }
 
+#include <iostream>
+
 int start_game_perft(board::Chessboard board, int &white_cpt, int &black_cpt,
                      int depth, board::Color side_turn)
 {
@@ -46,6 +48,9 @@ int start_game_perft(board::Chessboard board, int &white_cpt, int &black_cpt,
         return 1;
     int nodes = 0;
     auto moves = board.generate_legal_moves(side_turn);
+    // board.print_chessboard(side_turn);
+    // std::cout << "Legal moves: " << moves.size() << "\n";
+    // std::cout << "Depth value: " << depth << "\n";
     for (size_t i = 0; i < moves.size(); i++)
     {
         auto temp_board = board::Chessboard(board);
@@ -65,6 +70,8 @@ int start_game_perft(board::Chessboard board, int &white_cpt, int &black_cpt,
 
 void configurer_roque(std::string perft_string, board::Chessboard &board)
 {
+    if (perft_string[0] == '-')
+        return;
     for (size_t i = 0; i < perft_string.size(); i++)
     {
         if (perft_string[i] == 'K')
@@ -78,10 +85,15 @@ void configurer_roque(std::string perft_string, board::Chessboard &board)
     }
 }
 
-void set_enpassant(std::string perft_string, board::Chessboard &board)
+void set_enpassant(std::string perft_string, board::Chessboard &board,
+                   board::Color color)
 {
     if (perft_string[0] == '-')
         return;
+    if (color == board::Color::WHITE) // So our ennemy is black
+        perft_string[1] -= 1;
+    else
+        perft_string[1] += 1;
     board::Position pos(
         static_cast<board::File>(tolower(perft_string[0]) - 'a'),
         static_cast<board::Rank>(perft_string[1] - '1'));

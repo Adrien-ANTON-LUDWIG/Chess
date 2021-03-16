@@ -44,10 +44,12 @@ namespace board
         std::vector<Move> generate_legal_moves_knight(const Position &position,
                                                       const Color &color);
 
+        void check_promotion(std::vector<Move> &moves, const Color &color,
+                             const Position &front, const Move &move);
+
         void generate_pawn_capture(std::vector<Move> &moves,
                                    const Position &position, const Color &color,
-                                   const int &color_side, const File &file,
-                                   const int &side);
+                                   const File &file, const int &side);
 
         std::vector<Move> generate_legal_moves_pawn(const Position &position,
                                                     const Color &color);

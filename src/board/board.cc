@@ -181,9 +181,6 @@ namespace board
             int j = 3 - abs(i);
             for (int k = 0; k < 2; k++, j = -j)
             {
-                if (i == 0 && j == 0)
-                    continue;
-
                 auto rank_int = static_cast<int>(rank) + i;
                 auto file_int = static_cast<int>(file) + j;
 
@@ -211,20 +208,36 @@ namespace board
         return a;
     }
 
-    void Chessboard::generate_pawn_capture(std::vector<Move> &moves,
-                                           const Position &position,
-                                           const Color &color,
-                                           const int &color_side,
-                                           const File &file, const int &side)
+    void Chessboard::check_promotion(std::vector<Move> &moves,
+                                     const Color &color,
+                                     const Position &position, const Move &move)
     {
         static std::array promotion_rank = { Rank::EIGHT, Rank::ONE };
 
+        // Promotion
+        if (position.rank_get() == promotion_rank[color])
+            for (int i = 0; i < 4; i++)
+            {
+                Move prom_move = Move(move);
+                prom_move.set_promotion(
+                    static_cast<PieceType>(PieceType::QUEEN + i));
+                moves.push_back(prom_move);
+            }
+        else
+            moves.push_back(move);
+    }
+
+    void Chessboard::generate_pawn_capture(std::vector<Move> &moves,
+                                           const Position &position,
+                                           const Color &color, const File &file,
+                                           const int &side)
+    {
         if (position.file_get() != file)
         {
             Position capture(
                 static_cast<File>(static_cast<int>(position.file_get()) + side),
-                static_cast<Rank>(static_cast<int>(position.rank_get())
-                                  + 1 * color_side));
+                static_cast<Rank>(static_cast<int>(position.rank_get()) + 1
+                                  - 2 * static_cast<int>(color)));
             auto capture_color = is_piece_to_position(capture);
 
             if (capture_color != std::nullopt && capture_color != color)
@@ -232,11 +245,7 @@ namespace board
                 auto mv = Move(color, PieceType::PAWN, position, capture);
                 mv.set_capture(*this);
 
-                // Promotion
-                if (capture.rank_get() == promotion_rank[color])
-                    mv.set_promotion(PieceType::QUEEN);
-
-                moves.push_back(mv);
+                check_promotion(moves, color, capture, mv);
             }
         }
     }
@@ -248,14 +257,13 @@ namespace board
     {
         std::vector<Move> moves;
         static std::array pawns_rank = { Rank::TWO, Rank::SEVEN };
-        static std::array promotion_rank = { Rank::EIGHT, Rank::ONE };
         int color_int = static_cast<int>(color);
         int side = opposite_number(1, color_int);
 
-        // TODO en passant
         if (en_passant_ != std::nullopt
             && en_passant_->rank_get() == position.rank_get()
-            && abs(en_passant_->file_get() - position.file_get()) == 1)
+            && abs(en_passant_->file_get() - position.file_get()) == 1
+            && color_boards_[!color][en_passant_->to_index()])
         {
             auto mv = Move(color, PieceType::PAWN, position,
                            Position(en_passant_->file_get(),
@@ -266,8 +274,8 @@ namespace board
         }
 
         // Capture
-        generate_pawn_capture(moves, position, color, side, File::A, -1);
-        generate_pawn_capture(moves, position, color, side, File::H, 1);
+        generate_pawn_capture(moves, position, color, File::A, -1);
+        generate_pawn_capture(moves, position, color, File::H, 1);
 
         // Move front
         Position front(position.file_get(),
@@ -281,11 +289,7 @@ namespace board
 
         auto mv = Move(color, PieceType::PAWN, position, front);
 
-        // Promotion
-        if (front.rank_get() == promotion_rank[color])
-            mv.set_promotion(PieceType::QUEEN);
-
-        moves.push_back(mv);
+        check_promotion(moves, color, front, mv);
 
         if (position.rank_get() != pawns_rank[color_int])
             return moves;

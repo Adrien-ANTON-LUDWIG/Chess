@@ -100,8 +100,8 @@ namespace board
     {
         if (piece_type_ == PieceType::KING)
         {
-            board.king_castling_[color_] = 0;
-            board.queen_castling_[color_] = 0;
+            board.king_castling_[color_] = false;
+            board.queen_castling_[color_] = false;
             return;
         }
 
@@ -201,6 +201,9 @@ namespace board
     {
         board.update_piece(color_, PieceType::KING, start_.to_index(), 0);
         board.update_piece(color_, PieceType::ROOK, end_.to_index(), 0);
+        board.king_castling_[color_] = false;
+        board.queen_castling_[color_] = false;
+
         if (move_type_ == Castling::SMALL)
         {
             Position new_rook_pos = Position(

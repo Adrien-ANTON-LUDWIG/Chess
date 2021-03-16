@@ -7,3 +7,4 @@ CMakeFiles
 *.a
 *.so
 *.png
+__pycache__
