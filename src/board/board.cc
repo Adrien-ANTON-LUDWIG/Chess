@@ -614,6 +614,8 @@ namespace board
             fen += "k";
         if (queen_castling_[Color::BLACK])
             fen += "q";
+        if (fen[fen.size() - 1] == ' ')
+            fen += '-';
 
         fen += ' ';
 

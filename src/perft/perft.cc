@@ -48,7 +48,7 @@ int start_game_perft(board::Chessboard board, int &white_cpt, int &black_cpt,
         return 1;
     int nodes = 0;
     auto moves = board.generate_legal_moves(side_turn);
-    // std::cout << board.to_fen() << " " << depth << "\n";
+    //std::cout << board.to_fen() << " " << depth << "\n";
     // std::cout << "Legal moves: " << moves.size() << "\n";
     // std::cout << "Depth value: " << depth << "\n";
     for (size_t i = 0; i < moves.size(); i++)
