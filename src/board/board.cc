@@ -606,14 +606,14 @@ namespace board
         else
             fen += "b ";
 
-        if (king_castling_[Color::WHITE])
-            fen += "K";
-        if (queen_castling_[Color::BLACK])
-            fen += "Q";
-        if (king_castling_[Color::WHITE])
-            fen += "k";
-        if (queen_castling_[Color::BLACK])
-            fen += "q";
+        if (king_castling_[0])
+            fen += 'K';
+        if (queen_castling_[0])
+            fen += 'Q';
+        if (king_castling_[1])
+            fen += 'k';
+        if (queen_castling_[1])
+            fen += 'q';
         if (fen[fen.size() - 1] == ' ')
             fen += '-';
 

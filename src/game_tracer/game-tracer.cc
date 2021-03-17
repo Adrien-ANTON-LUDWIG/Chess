@@ -4,6 +4,8 @@
 #include <dlfcn.h>
 #include <iostream>
 
+#include "perft.hh"
+
 namespace board
 {
     GameTracer::GameTracer(std::string pgn_filepath,
@@ -205,9 +207,17 @@ namespace board
         // board_.print_chessboard(static_cast<Color>(color));
     }
 
-    void GameTracer::interractive()
+    void GameTracer::interractive(std::string &fen)
     {
         bool color = false;
+
+        if (!fen.empty())
+        {
+            board_ = init_board_from_perft(fen);
+            board_.set_castling(Color::WHITE, PieceType::QUEEN);
+            board_.set_castling(Color::BLACK, PieceType::KING);
+        }
+
         board_.print_chessboard(static_cast<Color>(color));
 
         while (1)
@@ -218,6 +228,7 @@ namespace board
             auto moves = pgn_parser::string_to_move(move_string);
 
             play_pgn_move(moves[0], color);
+            board_.print_chessboard(static_cast<Color>(color));
             board_.is_check(static_cast<Color>(color));
         }
     }

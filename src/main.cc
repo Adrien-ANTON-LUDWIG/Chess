@@ -20,8 +20,8 @@ int main(int argc, const char *argv[])
                                               "path to the PGN game file")(
             "listener,l", po::value<std::vector<std::string>>()->multitoken(),
             "list of paths to listener plugin")(
-            "perft", po::value<std::string>(),
-            "path to a perft file")("play", "Stdin waits for moves");
+            "perft", po::value<std::string>(), "path to a perft file")(
+            "play", po::value<std::string>(), "Stdin waits for moves");
 
         po::variables_map vm;
         po::store(po::parse_command_line(argc, argv, desc), vm);
@@ -44,7 +44,12 @@ int main(int argc, const char *argv[])
             std::cout << run_from_perft(vm["perft"].as<std::string>())
                       << std::endl;
         else if (vm.count("play"))
-            game_tracer.interractive();
+        {
+            std::string fen = "";
+            if (!vm["play"].empty())
+                fen = vm["play"].as<std::string>();
+            game_tracer.interractive(fen);
+        }
     }
     catch (const po::error &e)
     {

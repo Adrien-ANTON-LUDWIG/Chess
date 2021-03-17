@@ -4,7 +4,7 @@
 # set(MYVAR "val1" "val2") creates a list
 
 set(OPT_FLAGS
-    "-Wall -Wextra -Werror -pedantic -std=c++17 -g -ldl"
+    "-Wall -Wextra -Werror -pedantic -std=c++17 -g -Og -ldl"
 )
 
 # END OPTIMIZATION FLAGS
