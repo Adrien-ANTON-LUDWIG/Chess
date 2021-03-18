@@ -100,7 +100,7 @@ namespace board
 
     Color Chessboard::get_side_turn()
     {
-        return static_cast<Color>(turn_ % 2);
+        return side_turn_;
     }
 
     void Chessboard::set_castling(Color color, PieceType type)
@@ -632,6 +632,17 @@ namespace board
         return fen;
     }
 
+    PieceType Chessboard::get_piece_type(const Color &color,
+                                         const Position &position)
+    {
+        int index = position.to_index();
+        for (size_t p = 0; p < 6; p++)
+            if (pieces_[static_cast<int>(color)][p][index])
+                return static_cast<PieceType>(p);
+
+        throw std::logic_error("No piece here, circulez y a rien à voir");
+        return PieceType::KING;
+    }
 } // namespace board
 
 // rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1 1

@@ -35,6 +35,7 @@ namespace board
         bool is_stalemate(const Color &color);
         bool is_draw();
 
+        PieceType get_piece_type(const Color &color, const Position &position);
         std::pair<PieceType, Color> operator[](Position postion);
 
         void print_chessboard(const Color &color);

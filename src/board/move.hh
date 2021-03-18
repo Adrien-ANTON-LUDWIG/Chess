@@ -30,6 +30,9 @@ namespace board
         Move(const Color &color, const Position &start, const Position &end);
         Move(const Color &color, const Castling &castling_type);
 
+        // Constructeur EBNF
+        Move(const std::string &ebnf, Chessboard &board);
+
         // TODO void set_capture()
         bool set_capture(Chessboard &board);
         bool set_promotion(const PieceType &promotion_type);
@@ -37,6 +40,9 @@ namespace board
         void update_castling(Chessboard &board);
         void execute_move(Chessboard &board);
         void execute_castling(Chessboard &board);
+
+        // Algebraic notation EBNF
+        std::string to_ebnf();
 
         bool operator==(const Move &o);
 

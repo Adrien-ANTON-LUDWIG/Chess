@@ -57,6 +57,38 @@ namespace board
         move_type_ = castling_type;
     }
 
+    Move::Move(const std::string &ebnf, Chessboard &board)
+    {
+        File start_file = static_cast<File>(ebnf[0] - 'a');
+        Rank start_rank = static_cast<Rank>(ebnf[1] - '1');
+        File end_file = static_cast<File>(ebnf[2] - 'a');
+        Rank end_rank = static_cast<Rank>(ebnf[3] - '1');
+        color_ = board.get_side_turn();
+        start_ = Position(start_file, start_rank);
+        end_ = Position(end_file, end_rank);
+        piece_type_ = board.get_piece_type(color_, start_);
+
+        set_capture(board);
+
+        if (ebnf.size() == 5)
+        {
+            char p = ebnf[4];
+
+            if (p == 'q')
+                set_promotion(PieceType::QUEEN);
+            else if (p == 'r')
+                set_promotion(PieceType::ROOK);
+            else if (p == 'b')
+                set_promotion(PieceType::BISHOP);
+            else if (p == 'n')
+                set_promotion(PieceType::KNIGHT);
+        }
+
+        if (piece_type_ == PieceType::KING
+            && abs(start_.file_get() - end_.file_get()) == 2)
+            set_castling();
+    }
+
     bool Move::set_capture(Chessboard &board)
     {
         size_t end_index = end_.to_index();
@@ -94,6 +126,28 @@ namespace board
         promotion_ = true;
         promotion_type_ = promotion_type;
         return true;
+    }
+
+    void Move::set_castling()
+    {
+        if (start_.file_get() < end_.file_get())
+        {
+            move_type_ = Castling::SMALL;
+            if (color_ == Color::WHITE)
+                end_ = Position(File::H, Rank::ONE);
+            else
+                end_ = Position(File::H, Rank::EIGHT);
+        }
+        else
+        {
+            move_type_ = Castling::BIG;
+            if (color_ == Color::WHITE)
+                end_ = Position(File::A, Rank::ONE);
+            else
+                end_ = Position(File::A, Rank::EIGHT);
+        }
+
+        castling_ = true;
     }
 
     void Move::update_castling(Chessboard &board)
@@ -247,6 +301,22 @@ namespace board
         if (board.side_turn_)
             board.turn_++;
         board.side_turn_ = static_cast<Color>(!board.side_turn_);
+    }
+
+    std::string Move::to_ebnf()
+    {
+        static std::array<char, 4> piece = { 'q', 'r', 'b', 'n' };
+
+        std::string ebnf;
+        ebnf += 'a' + static_cast<char>(start_.file_get());
+        ebnf += '1' + static_cast<char>(start_.rank_get());
+        ebnf += 'a' + static_cast<char>(end_.file_get());
+        ebnf += '1' + static_cast<char>(end_.rank_get());
+
+        if (promotion_)
+            ebnf += piece[static_cast<int>(promotion_type_)];
+
+        return ebnf;
     }
 
     // Note: o = autre 🇫🇷🥖
