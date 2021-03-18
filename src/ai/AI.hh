@@ -11,9 +11,7 @@ namespace ai
     class AI
     {
     public:
-        using unique_evaluator = std::unique_ptr<ai::Evaluator>;
-
-        AI(unique_evaluator eval)
+        AI(std::unique_ptr<Evaluator> &eval)
             : board_()
         {
             eval_ = std::move(eval);

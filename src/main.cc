@@ -7,10 +7,12 @@
 #include "color.hh"
 #include "game-tracer.hh"
 #include "move.hh"
+#include "negamax.hh"
 #include "perft.hh"
 #include "pgn-parser.hh"
 #include "piece-type.hh"
 #include "random.hh"
+#include "sum.hh"
 #include "uci-time.hh"
 #include "uci.hh"
 
@@ -56,7 +58,10 @@ int main(int argc, const char *argv[])
             game_tracer.interractive(fen);
         }
 
-        ai::Random ai;
+        std::unique_ptr<ai::Evaluator> e =
+            std::make_unique<ai::Sum_Evaluator>();
+        ai::Negamax ai(e);
+        // ai::Random ai;
         ai.play_uci();
     }
     catch (const po::error &e)

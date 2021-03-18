@@ -4,7 +4,7 @@
 
 namespace ai
 {
-    class Sum_Evaluator : Evaluator
+    class Sum_Evaluator : public Evaluator
     {
     public:
         float evaluate_board(const board::Chessboard &board) override;

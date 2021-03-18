@@ -13,6 +13,7 @@ namespace ai
     class Evaluator
     {
     public:
+        ~Evaluator() = default;
         virtual float evaluate_board(const board::Chessboard &board) = 0;
     };
 } // namespace ai

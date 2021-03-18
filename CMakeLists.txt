@@ -23,7 +23,7 @@ set(SRC_ENGINE
     src/perft/perft.cc
     src/ai/AI.cc
     src/ai/random.cc
-    src/ai/minimax.cc
+    src/ai/negamax.cc
     src/ai/evaluators/sum.cc
 )
 

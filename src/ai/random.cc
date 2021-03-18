@@ -12,6 +12,7 @@ namespace ai
         if (moves.size() == 0)
             throw std::logic_error("No legal move available");
 
+        std::srand(time(nullptr)); // C++ style ! Yeah !
         return moves[std::rand() % moves.size()];
     }
 } // namespace ai
