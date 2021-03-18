@@ -2,47 +2,59 @@
 
 #include <fstream>
 
+board::Chessboard fen_to_board(std::istream &fen)
+{
+    std::string token;
+
+    fen >> token;
+    board::Chessboard board = init_board_from_perft(token);
+    token = "";
+
+    fen >> token;
+    auto side_turn = complete_board_information(token);
+    token = "";
+
+    fen >> token;
+    configurer_roque(token, board);
+    token = "";
+
+    fen >> token;
+    set_enpassant(token, board, side_turn);
+    token = "";
+
+    // Halfmove clock
+    fen >> token;
+    int black_cpt = std::stoi(token);
+    (void)black_cpt;
+    token = "";
+
+    // Fullmove
+    fen >> token;
+    int white_cpt = std::stoi(token);
+    (void)white_cpt;
+    token = "";
+
+    return board;
+}
+
 int run_from_perft(std::string perft_file)
 {
     std::string line;
     std::ifstream file(perft_file);
     if (file.is_open())
     {
-        file >> line;
-        board::Chessboard board = init_board_from_perft(line);
-        line = "";
-
-        file >> line;
-        auto side_turn = complete_board_information(line);
-        line = "";
-
-        file >> line;
-        configurer_roque(line, board);
-        line = "";
-
-        file >> line;
-        set_enpassant(line, board, side_turn);
-        line = "";
-
-        file >> line;
-        int black_cpt = std::stoi(line);
-        line = "";
-
-        file >> line;
-        int white_cpt = std::stoi(line);
-        line = "";
+        board::Chessboard board = fen_to_board(file);
 
         file >> line;
         int depth = std::stoi(line);
-        return start_game_perft(board, white_cpt, black_cpt, depth, side_turn);
+        return start_game_perft(board, depth, board.get_side_turn());
     }
     return 0;
 }
 
 #include <iostream>
 
-int start_game_perft(board::Chessboard board, int &white_cpt, int &black_cpt,
-                     int depth, board::Color side_turn)
+int start_game_perft(board::Chessboard board, int depth, board::Color side_turn)
 {
     if (!depth)
         return 1;
@@ -55,11 +67,6 @@ int start_game_perft(board::Chessboard board, int &white_cpt, int &black_cpt,
     {
         auto temp_board = board::Chessboard(board);
         moves[i].execute_move(temp_board);
-        if (side_turn == board::Color::WHITE)
-            white_cpt++;
-        else
-            black_cpt++;
-
         /*
                 {
                     std::cout << "\n---\n";
@@ -69,10 +76,10 @@ int start_game_perft(board::Chessboard board, int &white_cpt, int &black_cpt,
                     std::string unused;
                     std::cin >> unused;
                 }
-                */
+        */
 
         nodes += start_game_perft(
-            temp_board, white_cpt, black_cpt, depth - 1,
+            temp_board, depth - 1,
             static_cast<board::Color>(!static_cast<int>(side_turn)));
     }
     return nodes;

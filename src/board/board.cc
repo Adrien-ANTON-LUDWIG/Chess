@@ -98,7 +98,7 @@ namespace board
         return;
     }
 
-    Color Chessboard::get_side_turn()
+    Color Chessboard::get_side_turn() const
     {
         return side_turn_;
     }

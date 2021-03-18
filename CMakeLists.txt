@@ -21,6 +21,10 @@ set(SRC_ENGINE
     src/uci/uci-time.cc
     src/uci/uci.cc
     src/perft/perft.cc
+    src/ai/AI.cc
+    src/ai/random.cc
+    src/ai/minimax.cc
+    src/ai/evaluators/sum.cc
 )
 
 # Directories containing headers must be specified in the include_directories()
@@ -33,6 +37,8 @@ include_directories(
     "src/pieces"
     "src/uci"
     "src/perft"
+    "src/ai"
+    "src/ai/evaluators"
 )
 
 # Put your test files here

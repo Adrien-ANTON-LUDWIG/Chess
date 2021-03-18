@@ -9,6 +9,13 @@
 #include "move.hh"
 #include "piece-type.hh"
 #include "position.hh"
+#include "sum.hh"
+
+namespace ai
+{
+    class Sum_Evaluator;
+    class Random;
+} // namespace ai
 
 namespace board
 {
@@ -21,6 +28,8 @@ namespace board
         Chessboard(std::string string);
 
         friend class Move;
+        friend class ai::Sum_Evaluator;
+        friend class ai::Random;
 
         std::vector<Move> generate_legal_moves(const Color &side_turn);
         bool is_move_legal(const Move &move);
@@ -78,7 +87,7 @@ namespace board
                                const Castling &castling_type);
         void set_castling(Color color, PieceType type);
         void set_en_passant(Position pos);
-        Color get_side_turn();
+        Color get_side_turn() const;
 
         bool is_equivalent(const Chessboard &other);
         std::string to_fen();
