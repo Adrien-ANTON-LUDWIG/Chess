@@ -43,7 +43,8 @@ namespace ai
                 if (p < 5)
                     pieces_sum += board.pieces_[c][p][i] * heuristics[c][p][i];
                 else if (is_endgame(board))
-                    pieces_sum += board.pieces_[c][p][i] * heuristics[c][p][i];
+                    pieces_sum +=
+                        board.pieces_[c][p][i] * heuristics[c][p + 1][i];
                 else
                     pieces_sum += board.pieces_[c][p][i] * heuristics[c][p][i];
             }
