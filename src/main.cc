@@ -3,6 +3,7 @@
 #include <iostream>
 
 #include "AI.hh"
+#include "alpha-beta.hh"
 #include "board.hh"
 #include "color.hh"
 #include "game-tracer.hh"
@@ -60,8 +61,10 @@ int main(int argc, const char *argv[])
 
         std::unique_ptr<ai::Evaluator> e =
             std::make_unique<ai::Sum_Evaluator>();
-        ai::Negamax ai(e);
+
+        // ai::Negamax ai(e);
         // ai::Random ai;
+        ai::AlphaBeta ai(e);
         ai.play_uci();
     }
     catch (const po::error &e)

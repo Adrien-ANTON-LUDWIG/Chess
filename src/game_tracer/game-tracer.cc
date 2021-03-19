@@ -13,21 +13,26 @@ namespace board
         : board_()
         , pgn_filepath_(pgn_filepath)
     {
+        (void)listeners;
         history_.push_back(board_);
-
+#ifndef _STATIC
         for (auto l : listeners)
         {
             auto handle = dlopen(l.c_str(), RTLD_LAZY);
+
             auto symbol = dlsym(handle, "listener_create");
             Listener *listener = reinterpret_cast<Listener *(*)()>(symbol)();
             listeners_.push_back(listener);
         }
+#endif
     }
 
     GameTracer::~GameTracer()
     {
+#ifndef _STATIC
         for (size_t i = 0; i < listeners_.size(); i++)
             dlclose(listeners_[i]);
+#endif
     }
 
     void GameTracer::play_pgn_move(PgnMove &move, bool &color)

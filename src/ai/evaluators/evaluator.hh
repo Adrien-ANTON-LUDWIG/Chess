@@ -1,5 +1,7 @@
 #pragma once
 
+#include <limits>
+
 #include "board.hh"
 #include "color.hh"
 

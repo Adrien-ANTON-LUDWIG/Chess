@@ -15,7 +15,7 @@ namespace ai
     {
         if (!depth)
             return eval_->evaluate_board(board);
-        float max = -99999999;
+        float max = -std::numeric_limits<float>::infinity();
         std::vector<board::Move> moves =
             board.generate_legal_moves(board.get_side_turn());
 
@@ -35,7 +35,7 @@ namespace ai
 
     board::Move Negamax::best_move()
     {
-        float max = -99999999;
+        float max = -std::numeric_limits<float>::infinity();
         size_t max_index = 0;
         std::vector<board::Move> moves =
             board_.generate_legal_moves(board_.get_side_turn());
