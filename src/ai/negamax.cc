@@ -1,5 +1,8 @@
 #include "negamax.hh"
 
+#include <algorithm>
+#include <iostream>
+
 #define DEPTH 3
 
 namespace ai
@@ -12,7 +15,7 @@ namespace ai
     {
         if (!depth)
             return eval_->evaluate_board(board);
-        float max = __FLT_MIN__;
+        float max = -99999999;
         std::vector<board::Move> moves =
             board.generate_legal_moves(board.get_side_turn());
 
@@ -20,10 +23,11 @@ namespace ai
         {
             board::Chessboard fake_board = board;
             moves[i].execute_move(fake_board);
-            float score = negaMax(fake_board, depth - 1);
+            float score = -negaMax(fake_board, depth - 1);
+            // std::cout << "Score : " << score << " Score > max ? " << (score >
+            // max) << " Max: " << max << '\n';
 
-            if (score > max)
-                max = score;
+            max = std::max(score, max);
         }
 
         return max;
@@ -31,7 +35,7 @@ namespace ai
 
     board::Move Negamax::best_move()
     {
-        float max = __FLT_MIN__;
+        float max = -99999999;
         size_t max_index = 0;
         std::vector<board::Move> moves =
             board_.generate_legal_moves(board_.get_side_turn());
@@ -40,7 +44,7 @@ namespace ai
         {
             board::Chessboard fake_board = board_;
             moves[i].execute_move(fake_board);
-            float score = negaMax(fake_board, DEPTH - 1);
+            float score = -negaMax(fake_board, DEPTH - 1);
 
             if (score > max)
             {

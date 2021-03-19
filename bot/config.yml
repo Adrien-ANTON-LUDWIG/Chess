@@ -41,7 +41,7 @@ engine:                      # engine settings
   silence_stderr: false      # some engines (yes you, leela) are very noisy
 
 abort_time: 20               # time to abort a game in seconds when there is no activity
-fake_think_time: false       # artificially slow down the bot to pretend like it's thinking
+fake_think_time: 1       # artificially slow down the bot to pretend like it's thinking
 # move_overhead: 2000          # increase if your bot flags games too often
 
 challenge:                   # incoming challenges
