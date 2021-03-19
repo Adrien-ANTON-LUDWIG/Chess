@@ -11,11 +11,35 @@ namespace ai
         : AI(eval)
     {}
 
+    float AlphaBeta::quiesce(board::Chessboard &board, float alpha, float beta)
+    {
+        float stand_pat = eval_->evaluate_board(board);
+        if (stand_pat >= beta)
+            return beta;
+        if (alpha < stand_pat)
+            alpha = stand_pat;
+
+        auto moves = board.generate_legal_moves(board.get_side_turn());
+        for (size_t i = 0; i < moves.size(); i++)
+        {
+            if (!board.is_piece_to_position(moves[i].get_end()))
+                continue;
+            board::Chessboard b = board::Chessboard(board);
+            moves[i].execute_move(b);
+            float score = -quiesce(b, -beta, -alpha);
+            if (score >= beta)
+                return beta;
+            if (score > alpha)
+                alpha = score;
+        }
+        return alpha;
+    }
+
     float AlphaBeta::alphaBeta(board::Chessboard &board, float alpha,
                                float beta, int depth)
     {
         if (!depth)
-            return eval_->evaluate_board(board);
+            return quiesce(board, alpha, beta);
         std::vector<board::Move> moves =
             board.generate_legal_moves(board.get_side_turn());
 

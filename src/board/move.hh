@@ -40,7 +40,7 @@ namespace board
         void update_castling(Chessboard &board);
         void execute_move(Chessboard &board);
         void execute_castling(Chessboard &board);
-
+        Position get_end();
         // Algebraic notation EBNF
         std::string to_ebnf();
 

@@ -89,6 +89,11 @@ namespace board
             set_castling();
     }
 
+    Position Move::get_end()
+    {
+        return end_;
+    }
+
     bool Move::set_capture(Chessboard &board)
     {
         size_t end_index = end_.to_index();
