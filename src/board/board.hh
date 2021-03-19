@@ -9,10 +9,10 @@
 #include "move.hh"
 #include "piece-type.hh"
 #include "position.hh"
-#include "sum.hh"
 
 namespace ai
 {
+    class Simplified_Evaluator;
     class Sum_Evaluator;
     class Random;
 } // namespace ai
@@ -28,6 +28,7 @@ namespace board
         Chessboard(std::string string);
 
         friend class Move;
+        friend class ai::Simplified_Evaluator;
         friend class ai::Sum_Evaluator;
         friend class ai::Random;
 

@@ -12,7 +12,7 @@ namespace ai
             return std::numeric_limits<float>::infinity();
 
         float pieces_sum = 0.0f;
-        float values[] = { 10.0f, 5.0f, 3.0f, 3.0f, 1.0f, 0.f };
+        float values[] = { 900.0f, 500.0f, 330.0f, 320.0f, 100.0f, 20000.f };
         for (int i = 0; i < 6; i++)
         {
             pieces_sum +=
