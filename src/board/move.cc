@@ -93,7 +93,10 @@ namespace board
     {
         return end_;
     }
-
+    std::optional<std::pair<PieceType, Position>> Move::get_capture()
+    {
+        return capture_;
+    }
     bool Move::set_capture(Chessboard &board)
     {
         size_t end_index = end_.to_index();

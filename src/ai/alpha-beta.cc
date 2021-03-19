@@ -22,7 +22,7 @@ namespace ai
         auto moves = board.generate_legal_moves(board.get_side_turn());
         for (size_t i = 0; i < moves.size(); i++)
         {
-            if (!board.is_piece_to_position(moves[i].get_end()))
+            if (moves[i].get_capture() == std::nullopt)
                 continue;
             board::Chessboard b = board::Chessboard(board);
             moves[i].execute_move(b);

@@ -43,7 +43,7 @@ namespace board
         Position get_end();
         // Algebraic notation EBNF
         std::string to_ebnf();
-
+        std::optional<std::pair<PieceType, Position>> get_capture();
         bool operator==(const Move &o);
 
     private:
