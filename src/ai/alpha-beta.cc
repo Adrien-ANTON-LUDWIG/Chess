@@ -14,6 +14,8 @@ namespace ai
     float AlphaBeta::quiesce(board::Chessboard &board, float alpha, float beta)
     {
         float stand_pat = eval_->evaluate_board(board);
+        return stand_pat;
+
         if (stand_pat >= beta)
             return beta;
         if (alpha < stand_pat)

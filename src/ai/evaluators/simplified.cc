@@ -28,7 +28,7 @@ namespace ai
         board::Chessboard board_copy = board;
         if (board_copy.is_checkmate(
                 static_cast<board::Color>(!board_copy.get_side_turn())))
-            return __FLT_MAX__;
+            return std::numeric_limits<float>::infinity();
 
         float pieces_sum = 0.0f;
         float values[] = { 900.0f, 500.0f, 330.0f, 320.0f, 100.0f, 0.0f };
@@ -37,7 +37,7 @@ namespace ai
         {
             pieces_sum += board.pieces_[c][p].count() * values[p];
             pieces_sum -=
-                1.5f * board.pieces_[(c + 1) % 2][p].count() * values[p];
+                1.3f * board.pieces_[(c + 1) % 2][p].count() * values[p];
 
             for (size_t i = 0; i < 64; i++)
             {
@@ -50,6 +50,10 @@ namespace ai
                     pieces_sum += board.pieces_[c][p][i] * heuristics[c][p][i];
             }
         }
+
+        if (board_copy.is_draw())
+            return (pieces_sum >= 0 ? -1 : 1) * 100;
+
         return pieces_sum;
     }
 } // namespace ai
