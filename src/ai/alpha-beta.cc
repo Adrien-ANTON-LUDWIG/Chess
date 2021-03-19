@@ -14,10 +14,17 @@ namespace ai
     float AlphaBeta::quiesce(board::Chessboard &board, float alpha, float beta)
     {
         float stand_pat = eval_->evaluate_board(board);
-        return stand_pat;
 
         if (stand_pat >= beta)
             return beta;
+
+        float delta = 900; // queen value
+        // if (isPromotingPawn())
+        //    BIG_DELTA += 775;
+
+        if (stand_pat + delta < alpha)
+            return alpha;
+
         if (alpha < stand_pat)
             alpha = stand_pat;
 
@@ -31,6 +38,7 @@ namespace ai
             float score = -quiesce(b, -beta, -alpha);
             if (score >= beta)
                 return beta;
+
             if (score > alpha)
                 alpha = score;
         }
