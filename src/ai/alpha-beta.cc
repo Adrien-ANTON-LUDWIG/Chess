@@ -39,7 +39,7 @@ namespace ai
                                float beta, int depth)
     {
         if (!depth)
-            return quiesce(board, alpha, beta);
+            return eval_->evaluate_board(board);
         std::vector<board::Move> moves =
             board.generate_legal_moves(board.get_side_turn());
 
