@@ -24,8 +24,9 @@ set(SRC_ENGINE
     src/ai/AI.cc
     src/ai/random.cc
     src/ai/negamax.cc
-    src/ai/evaluators/sum.cc
     src/ai/alpha-beta.cc
+    src/ai/evaluators/sum.cc
+    src/ai/evaluators/simplified.cc
 )
 
 # Directories containing headers must be specified in the include_directories()

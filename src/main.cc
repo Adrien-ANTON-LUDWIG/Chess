@@ -13,6 +13,7 @@
 #include "pgn-parser.hh"
 #include "piece-type.hh"
 #include "random.hh"
+#include "simplified.hh"
 #include "sum.hh"
 #include "uci-time.hh"
 #include "uci.hh"
@@ -60,7 +61,8 @@ int main(int argc, const char *argv[])
         }
 
         std::unique_ptr<ai::Evaluator> e =
-            std::make_unique<ai::Sum_Evaluator>();
+            //   std::make_unique<ai::Sum_Evaluator>();
+            std::make_unique<ai::Simplified_Evaluator>();
 
         // ai::Negamax ai(e);
         // ai::Random ai;
