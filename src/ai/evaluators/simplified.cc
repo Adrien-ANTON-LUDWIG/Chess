@@ -37,7 +37,7 @@ namespace ai
         {
             pieces_sum += board.pieces_[c][p].count() * values[p];
             pieces_sum -=
-                3.0f * board.pieces_[(c + 1) % 2][p].count() * values[p];
+                30.0f * board.pieces_[(c + 1) % 2][p].count() * values[p];
 
             for (size_t i = 0; i < 64; i++)
             {
