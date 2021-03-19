@@ -31,12 +31,13 @@ namespace ai
             return __FLT_MAX__;
 
         float pieces_sum = 0.0f;
-        float values[] = { 900.0f, 500.0f, 330.0f, 320.0f, 100.0f, 20000.f };
+        float values[] = { 900.0f, 500.0f, 330.0f, 320.0f, 100.0f, 0.0f };
         int c = static_cast<int>(board.get_side_turn());
         for (int p = 0; p < 6; p++)
         {
             pieces_sum += board.pieces_[c][p].count() * values[p];
-            pieces_sum -= board.pieces_[(c + 1) % 2][p].count() * values[p];
+            pieces_sum -=
+                1.5f * board.pieces_[(c + 1) % 2][p].count() * values[p];
 
             for (size_t i = 0; i < 64; i++)
             {
@@ -49,7 +50,6 @@ namespace ai
                     pieces_sum += board.pieces_[c][p][i] * heuristics[c][p][i];
             }
         }
-        return pieces_sum
-            + log2(board.color_boards_[board.get_side_turn()].to_ullong()) - 32;
+        return pieces_sum;
     }
 } // namespace ai
