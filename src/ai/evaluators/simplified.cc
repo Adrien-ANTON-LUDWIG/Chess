@@ -23,6 +23,37 @@ namespace ai
         return no_more_queen || one_minor_piece;
     }
 
+    float
+    Simplified_Evaluator::controlled_ground(const board::Chessboard &board)
+    {
+        // All my homies hate optimization
+        auto newboard = board::Chessboard(board);
+
+        // Pure ground control
+        auto moves = newboard.generate_legal_moves(board.get_side_turn());
+        std::bitset<64> ground;
+        for (auto m : moves)
+            ground[m.get_end().to_index()] = true;
+        float controlled = ground.count();
+        if (board.get_side_turn() == board::Color::WHITE)
+            controlled +=
+                (ground & std::bitset<64>(0xFFFFFFFF00000000)).count();
+        else
+            controlled +=
+                (ground & std::bitset<64>(0x00000000FFFFFFFF)).count();
+
+        // Self-protection
+        float values[] = { 900.0f, 500.0f, 330.0f, 320.0f, 100.0f, 0.0f };
+        for (int i = 0; i < 6; i++)
+        {
+            controlled +=
+                (ground & board.pieces_[board.get_side_turn()][i]).count()
+                * values[i] * 0.2f;
+        }
+
+        return controlled;
+    }
+
     float Simplified_Evaluator::evaluate_board(const board::Chessboard &board)
     {
         board::Chessboard board_copy = board;
@@ -53,6 +84,6 @@ namespace ai
         if (board_copy.is_draw())
             return (pieces_sum >= 0 ? -1 : 1) * 100;
 
-        return pieces_sum;
+        return pieces_sum + controlled_ground(board);
     }
 } // namespace ai

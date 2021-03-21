@@ -19,7 +19,7 @@ namespace ai
             return beta;
 
         float delta = 900; // queen value
-        // if (isPromotingPawn())
+        // if (isPromotingPawn()) // TODO
         //    BIG_DELTA += 775;
 
         if (stand_pat + delta < alpha)

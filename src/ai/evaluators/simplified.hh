@@ -9,6 +9,7 @@ namespace ai
     public:
         bool is_endgame(const board::Chessboard &board);
         float evaluate_board(const board::Chessboard &board) override;
+        float controlled_ground(const board::Chessboard &board);
 
         float heuristics[2][7][64] = {
             {
