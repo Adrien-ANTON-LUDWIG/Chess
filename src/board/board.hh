@@ -10,6 +10,13 @@
 #include "piece-type.hh"
 #include "position.hh"
 
+namespace ai
+{
+    class Simplified_Evaluator;
+    class Sum_Evaluator;
+    class Random;
+} // namespace ai
+
 namespace board
 {
     class Move;
@@ -21,6 +28,9 @@ namespace board
         Chessboard(std::string string);
 
         friend class Move;
+        friend class ai::Simplified_Evaluator;
+        friend class ai::Sum_Evaluator;
+        friend class ai::Random;
 
         std::vector<Move> generate_legal_moves(const Color &side_turn);
         bool is_move_legal(const Move &move);
@@ -35,6 +45,7 @@ namespace board
         bool is_stalemate(const Color &color);
         bool is_draw();
 
+        PieceType get_piece_type(const Color &color, const Position &position);
         std::pair<PieceType, Color> operator[](Position postion);
 
         void print_chessboard(const Color &color);
@@ -44,10 +55,12 @@ namespace board
         std::vector<Move> generate_legal_moves_knight(const Position &position,
                                                       const Color &color);
 
+        void check_promotion(std::vector<Move> &moves, const Color &color,
+                             const Position &front, const Move &move);
+
         void generate_pawn_capture(std::vector<Move> &moves,
                                    const Position &position, const Color &color,
-                                   const int &color_side, const File &file,
-                                   const int &side);
+                                   const File &file, const int &side);
 
         std::vector<Move> generate_legal_moves_pawn(const Position &position,
                                                     const Color &color);
@@ -75,9 +88,10 @@ namespace board
                                const Castling &castling_type);
         void set_castling(Color color, PieceType type);
         void set_en_passant(Position pos);
-        Color get_side_turn();
+        Color get_side_turn() const;
 
         bool is_equivalent(const Chessboard &other);
+        std::string to_fen();
 
     private:
         // pieces_[Color][PieceType]

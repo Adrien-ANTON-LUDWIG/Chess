@@ -4,6 +4,8 @@
 #include <dlfcn.h>
 #include <iostream>
 
+#include "perft.hh"
+
 namespace board
 {
     GameTracer::GameTracer(std::string pgn_filepath,
@@ -11,21 +13,26 @@ namespace board
         : board_()
         , pgn_filepath_(pgn_filepath)
     {
+        (void)listeners;
         history_.push_back(board_);
-
+#ifndef _STATIC
         for (auto l : listeners)
         {
             auto handle = dlopen(l.c_str(), RTLD_LAZY);
+
             auto symbol = dlsym(handle, "listener_create");
             Listener *listener = reinterpret_cast<Listener *(*)()>(symbol)();
             listeners_.push_back(listener);
         }
+#endif
     }
 
     GameTracer::~GameTracer()
     {
+#ifndef _STATIC
         for (size_t i = 0; i < listeners_.size(); i++)
             dlclose(listeners_[i]);
+#endif
     }
 
     void GameTracer::play_pgn_move(PgnMove &move, bool &color)
@@ -205,9 +212,17 @@ namespace board
         // board_.print_chessboard(static_cast<Color>(color));
     }
 
-    void GameTracer::interractive()
+    void GameTracer::interractive(std::string &fen)
     {
         bool color = false;
+
+        if (!fen.empty())
+        {
+            board_ = init_board_from_perft(fen);
+            board_.set_castling(Color::WHITE, PieceType::QUEEN);
+            board_.set_castling(Color::BLACK, PieceType::KING);
+        }
+
         board_.print_chessboard(static_cast<Color>(color));
 
         while (1)
@@ -218,6 +233,7 @@ namespace board
             auto moves = pgn_parser::string_to_move(move_string);
 
             play_pgn_move(moves[0], color);
+            board_.print_chessboard(static_cast<Color>(color));
             board_.is_check(static_cast<Color>(color));
         }
     }

@@ -57,6 +57,46 @@ namespace board
         move_type_ = castling_type;
     }
 
+    Move::Move(const std::string &ebnf, Chessboard &board)
+    {
+        File start_file = static_cast<File>(ebnf[0] - 'a');
+        Rank start_rank = static_cast<Rank>(ebnf[1] - '1');
+        File end_file = static_cast<File>(ebnf[2] - 'a');
+        Rank end_rank = static_cast<Rank>(ebnf[3] - '1');
+        color_ = board.get_side_turn();
+        start_ = Position(start_file, start_rank);
+        end_ = Position(end_file, end_rank);
+        piece_type_ = board.get_piece_type(color_, start_);
+
+        set_capture(board);
+
+        if (ebnf.size() == 5)
+        {
+            char p = ebnf[4];
+
+            if (p == 'q')
+                set_promotion(PieceType::QUEEN);
+            else if (p == 'r')
+                set_promotion(PieceType::ROOK);
+            else if (p == 'b')
+                set_promotion(PieceType::BISHOP);
+            else if (p == 'n')
+                set_promotion(PieceType::KNIGHT);
+        }
+
+        if (piece_type_ == PieceType::KING
+            && abs(start_.file_get() - end_.file_get()) == 2)
+            set_castling();
+    }
+
+    Position Move::get_end()
+    {
+        return end_;
+    }
+    std::optional<std::pair<PieceType, Position>> Move::get_capture()
+    {
+        return capture_;
+    }
     bool Move::set_capture(Chessboard &board)
     {
         size_t end_index = end_.to_index();
@@ -96,12 +136,34 @@ namespace board
         return true;
     }
 
+    void Move::set_castling()
+    {
+        if (start_.file_get() < end_.file_get())
+        {
+            move_type_ = Castling::SMALL;
+            if (color_ == Color::WHITE)
+                end_ = Position(File::H, Rank::ONE);
+            else
+                end_ = Position(File::H, Rank::EIGHT);
+        }
+        else
+        {
+            move_type_ = Castling::BIG;
+            if (color_ == Color::WHITE)
+                end_ = Position(File::A, Rank::ONE);
+            else
+                end_ = Position(File::A, Rank::EIGHT);
+        }
+
+        castling_ = true;
+    }
+
     void Move::update_castling(Chessboard &board)
     {
         if (piece_type_ == PieceType::KING)
         {
-            board.king_castling_[color_] = 0;
-            board.queen_castling_[color_] = 0;
+            board.king_castling_[color_] = false;
+            board.queen_castling_[color_] = false;
             return;
         }
 
@@ -115,7 +177,7 @@ namespace board
                 else if (start_.file_get() == File::H)
                     board.king_castling_[Color::WHITE] = false;
             }
-            else if (end_.rank_get() == Rank::EIGHT)
+            if (end_.rank_get() == Rank::EIGHT)
             {
                 if (end_.file_get() == File::A)
                     board.queen_castling_[Color::BLACK] = false;
@@ -132,7 +194,7 @@ namespace board
                 else if (end_.file_get() == File::H)
                     board.king_castling_[Color::WHITE] = false;
             }
-            else if (start_.rank_get() == Rank::EIGHT)
+            if (start_.rank_get() == Rank::EIGHT)
             {
                 if (start_.file_get() == File::A)
                     board.queen_castling_[Color::BLACK] = false;
@@ -141,6 +203,19 @@ namespace board
             }
         }
     }
+
+    /*
+    8 | 63 62 61 60 59 58 57 56
+    7 | 55 54 53 52 51 50 49 48
+    6 | 47 46 45 44 43 42 41 40
+    5 | 39 38 37 36 35 34 33 32
+    4 | 31 30 29 28 27 26 25 24
+    3 | 23 22 21 20 19 18 17 16
+    2 | 15 14 13 12 11 10 09 08
+    1 | 07 06 05 04 03 02 01 00
+    ---------------------------
+      | A  B  C  D  E  F  G  H
+    */
 
     void Move::execute_move(Chessboard &board)
     {
@@ -201,6 +276,9 @@ namespace board
     {
         board.update_piece(color_, PieceType::KING, start_.to_index(), 0);
         board.update_piece(color_, PieceType::ROOK, end_.to_index(), 0);
+        board.king_castling_[color_] = false;
+        board.queen_castling_[color_] = false;
+
         if (move_type_ == Castling::SMALL)
         {
             Position new_rook_pos = Position(
@@ -233,6 +311,22 @@ namespace board
         board.side_turn_ = static_cast<Color>(!board.side_turn_);
     }
 
+    std::string Move::to_ebnf()
+    {
+        static std::array<char, 4> piece = { 'q', 'r', 'b', 'n' };
+
+        std::string ebnf;
+        ebnf += 'a' + static_cast<char>(start_.file_get());
+        ebnf += '1' + static_cast<char>(start_.rank_get());
+        ebnf += 'a' + static_cast<char>(end_.file_get());
+        ebnf += '1' + static_cast<char>(end_.rank_get());
+
+        if (promotion_)
+            ebnf += piece[static_cast<int>(promotion_type_)];
+
+        return ebnf;
+    }
+
     // Note: o = autre 🇫🇷🥖
     bool Move::operator==(const Move &o)
     {
@@ -240,5 +334,15 @@ namespace board
             && start_ == o.start_ && end_ == o.end_ && capture_ == o.capture_
             && promotion_ == o.promotion_ && castling_ == o.castling_
             && move_type_ == o.move_type_;
+    }
+
+    void operator<<(std::ostream &o, const Move &move)
+    {
+        o << "Move -> Color : " + std::to_string(move.color_)
+                + ", piece : " + std::to_string(move.piece_type_)
+                + ", start : (" + std::to_string(move.start_.file_get()) + ", "
+                + std::to_string(move.start_.rank_get())
+                + "), end : " + std::to_string(move.end_.file_get()) + ", "
+                + std::to_string(move.end_.rank_get()) + ")\n";
     }
 } // namespace board

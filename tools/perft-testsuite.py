@@ -21,6 +21,7 @@ def print_test_result(test_name, ref_result, engine_result):
 
 
 def perft_test_file(perft_file_path, engine_dir_path):
+    #print(perft_file_path)
     try:
         engine_perft = int(
             subprocess.run([os.path.join(engine_dir_path, 'chessengine'), '--perft', perft_file_path],

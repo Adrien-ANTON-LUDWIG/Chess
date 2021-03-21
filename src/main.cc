@@ -1,13 +1,22 @@
 #include <boost/program_options.hpp>
+#include <fstream>
 #include <iostream>
 
+#include "AI.hh"
+#include "alpha-beta.hh"
 #include "board.hh"
 #include "color.hh"
 #include "game-tracer.hh"
 #include "move.hh"
+#include "negamax.hh"
 #include "perft.hh"
 #include "pgn-parser.hh"
 #include "piece-type.hh"
+#include "random.hh"
+#include "simplified.hh"
+#include "sum.hh"
+#include "uci-time.hh"
+#include "uci.hh"
 
 namespace po = boost::program_options;
 
@@ -20,8 +29,8 @@ int main(int argc, const char *argv[])
                                               "path to the PGN game file")(
             "listener,l", po::value<std::vector<std::string>>()->multitoken(),
             "list of paths to listener plugin")(
-            "perft", po::value<std::string>(),
-            "path to a perft file")("play", "Stdin waits for moves");
+            "perft", po::value<std::string>(), "path to a perft file")(
+            "play", po::value<std::string>(), "Stdin waits for moves");
 
         po::variables_map vm;
         po::store(po::parse_command_line(argc, argv, desc), vm);
@@ -44,7 +53,21 @@ int main(int argc, const char *argv[])
             std::cout << run_from_perft(vm["perft"].as<std::string>())
                       << std::endl;
         else if (vm.count("play"))
-            game_tracer.interractive();
+        {
+            std::string fen = "";
+            if (!vm["play"].empty())
+                fen = vm["play"].as<std::string>();
+            game_tracer.interractive(fen);
+        }
+
+        std::unique_ptr<ai::Evaluator> e =
+            //   std::make_unique<ai::Sum_Evaluator>();
+            std::make_unique<ai::Simplified_Evaluator>();
+
+        // ai::Negamax ai(e);
+        // ai::Random ai;
+        ai::AlphaBeta ai(e);
+        ai.play_uci();
     }
     catch (const po::error &e)
     {

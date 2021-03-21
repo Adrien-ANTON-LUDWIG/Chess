@@ -7,3 +7,6 @@ CMakeFiles
 *.a
 *.so
 *.png
+__pycache__
+lichess-bot
+bot/lichess-bot

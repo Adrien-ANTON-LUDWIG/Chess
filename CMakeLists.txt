@@ -4,7 +4,7 @@
 # set(MYVAR "val1" "val2") creates a list
 
 set(OPT_FLAGS
-    "-Wall -Wextra -Werror -pedantic -std=c++17 -g -ldl"
+    "-Ofast -march=native"
 )
 
 # END OPTIMIZATION FLAGS
@@ -21,6 +21,12 @@ set(SRC_ENGINE
     src/uci/uci-time.cc
     src/uci/uci.cc
     src/perft/perft.cc
+    src/ai/AI.cc
+    src/ai/random.cc
+    src/ai/negamax.cc
+    src/ai/alpha-beta.cc
+    src/ai/evaluators/sum.cc
+    src/ai/evaluators/simplified.cc
 )
 
 # Directories containing headers must be specified in the include_directories()
@@ -33,6 +39,8 @@ include_directories(
     "src/pieces"
     "src/uci"
     "src/perft"
+    "src/ai"
+    "src/ai/evaluators"
 )
 
 # Put your test files here
@@ -55,9 +63,9 @@ if (NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Release")
 endif()
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror -Wextra -pedantic")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror -Wextra -pedantic -std=c++17")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${OPT_FLAGS}")
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 -g3")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Og -g3 -fsanitize=address")
 
 # LIBRARIES
 if (CMAKE_BUILD_TYPE STREQUAL "Release")
@@ -69,7 +77,7 @@ set(LIBRARIES Boost::system Boost::program_options ${CMAKE_DL_LIBS})
 # CHESSENGINE
 add_executable(chessengine)
 target_sources(chessengine PRIVATE "src/main.cc" ${SRC_ENGINE})
-target_link_libraries(chessengine PRIVATE ${LIBRARIES})
+target_link_libraries(chessengine PRIVATE ${LIBRARIES} -ldl)
 
 
 # TESTS
@@ -92,6 +100,7 @@ endif()
 # STATIC TARGET
 if (CMAKE_BUILD_TYPE STREQUAL "Release")
     add_executable(chessengine-static)
+    target_compile_definitions(chessengine-static PRIVATE -D_STATIC)
     target_sources(chessengine-static PRIVATE "src/main.cc" ${SRC_ENGINE})
     target_link_libraries(chessengine-static PRIVATE ${LIBRARIES} -static)
 endif()

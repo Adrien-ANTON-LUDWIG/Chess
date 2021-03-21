@@ -17,7 +17,7 @@ namespace board
 
         void play_pgn_move(PgnMove &move, bool &color);
         void play_pgn_game();
-        void interractive();
+        void interractive(std::string &fen);
 
         bool is_draw_repetition();
 
