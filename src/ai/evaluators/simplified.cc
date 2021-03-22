@@ -34,7 +34,7 @@ namespace ai
         std::bitset<64> ground;
         for (auto m : moves)
             ground[m.get_end().to_index()] = true;
-        float controlled = ground.count();
+        float controlled = ground.count() * 0.5f;
         if (board.get_side_turn() == board::Color::WHITE)
             controlled +=
                 (ground & std::bitset<64>(0xFFFFFFFF00000000)).count();
@@ -49,6 +49,9 @@ namespace ai
             controlled +=
                 (ground & board.pieces_[board.get_side_turn()][i]).count()
                 * values[i] * 0.2f;
+            controlled +=
+                (ground & board.pieces_[!board.get_side_turn()][i]).count()
+                * values[i] * 0.3f;
         }
 
         return controlled;
