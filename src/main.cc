@@ -27,7 +27,7 @@ int main(int argc, const char *argv[])
         po::options_description desc{ "Options" };
         desc.add_options()("help,h", "UsAgE")("pgn", po::value<std::string>(),
                                               "path to the PGN game file")(
-            "listener,l", po::value<std::vector<std::string>>()->multitoken(),
+            "listeners,l", po::value<std::vector<std::string>>()->multitoken(),
             "list of paths to listener plugin")(
             "perft", po::value<std::string>(), "path to a perft file")(
             "play", po::value<std::string>(), "Stdin waits for moves");
