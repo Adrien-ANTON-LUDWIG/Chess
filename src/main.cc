@@ -39,8 +39,8 @@ int main(int argc, const char *argv[])
         std::string pgn_filepath = "";
         std::vector<std::string> listeners;
 
-        if (!vm["listener"].empty())
-            listeners = vm["listener"].as<std::vector<std::string>>();
+        if (!vm["listeners"].empty())
+            listeners = vm["listeners"].as<std::vector<std::string>>();
 
         if (!vm["pgn"].empty())
             pgn_filepath = vm["pgn"].as<std::string>();
@@ -59,15 +59,17 @@ int main(int argc, const char *argv[])
                 fen = vm["play"].as<std::string>();
             game_tracer.interractive(fen);
         }
+        else
+        {
+            std::unique_ptr<ai::Evaluator> e =
+                //   std::make_unique<ai::Sum_Evaluator>();
+                std::make_unique<ai::Simplified_Evaluator>();
 
-        std::unique_ptr<ai::Evaluator> e =
-            //   std::make_unique<ai::Sum_Evaluator>();
-            std::make_unique<ai::Simplified_Evaluator>();
-
-        // ai::Negamax ai(e);
-        // ai::Random ai;
-        ai::AlphaBeta ai(e);
-        ai.play_uci();
+            // ai::Negamax ai(e);
+            // ai::Random ai;
+            ai::AlphaBeta ai(e);
+            ai.play_uci();
+        }
     }
     catch (const po::error &e)
     {

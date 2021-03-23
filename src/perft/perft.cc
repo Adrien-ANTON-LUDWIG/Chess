@@ -12,6 +12,7 @@ board::Chessboard fen_to_board(std::istream &fen)
 
     fen >> token;
     auto side_turn = complete_board_information(token);
+    board.set_side_turn(side_turn);
     token = "";
 
     fen >> token;

@@ -20,7 +20,16 @@ namespace board
         {
             auto handle = dlopen(l.c_str(), RTLD_LAZY);
 
+            if (handle == nullptr)
+                throw std::invalid_argument("Could not open : " + l + "\n"
+                                            + dlerror());
+
             auto symbol = dlsym(handle, "listener_create");
+
+            if (symbol == nullptr)
+                throw std::invalid_argument("Could not open : " + l + "\n"
+                                            + dlerror());
+
             Listener *listener = reinterpret_cast<Listener *(*)()>(symbol)();
             listeners_.push_back(listener);
         }

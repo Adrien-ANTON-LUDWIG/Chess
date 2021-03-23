@@ -89,6 +89,7 @@ namespace board
         void set_castling(Color color, PieceType type);
         void set_en_passant(Position pos);
         Color get_side_turn() const;
+        void set_side_turn(const bool &side_turn);
 
         bool is_equivalent(const Chessboard &other);
         std::string to_fen();

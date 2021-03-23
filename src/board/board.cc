@@ -103,6 +103,11 @@ namespace board
         return side_turn_;
     }
 
+    void Chessboard::set_side_turn(const bool &side_turn)
+    {
+        side_turn_ = static_cast<Color>(side_turn);
+    }
+
     void Chessboard::set_castling(Color color, PieceType type)
     {
         if (type == PieceType::KING)
