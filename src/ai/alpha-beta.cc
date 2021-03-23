@@ -70,9 +70,8 @@ namespace ai
 
     board::Move AlphaBeta::best_move()
     {
-        // float alpha = std::numeric_limits<float>::infinity() + 1;
-        float alpha = std::numeric_limits<float>::lowest();
-        //  float alpha = -99999999;
+        // float alpha = std::numeric_limits<float>::lowest();
+        float alpha = -std::numeric_limits<float>::infinity();
         float beta = std::numeric_limits<float>::infinity();
         size_t alpha_index = 0;
         std::vector<board::Move> moves =
