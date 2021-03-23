@@ -10,9 +10,4 @@ namespace board
         this->file_ = static_cast<File>(x);
         this->rank_ = static_cast<Rank>(y);
     }
-
-    int Position::to_index() const
-    {
-        return static_cast<int>(rank_) * 8 + 7 - static_cast<int>(file_);
-    }
 } // namespace board

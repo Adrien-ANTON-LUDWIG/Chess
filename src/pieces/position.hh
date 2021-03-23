@@ -46,7 +46,10 @@ namespace board
         File file_get() const;
         Rank rank_get() const;
 
-        int to_index() const;
+        inline int to_index() const
+        {
+            return static_cast<int>(rank_) * 8 + 7 - static_cast<int>(file_);
+        }
 
         bool operator==(const Position &pos) const;
         bool operator!=(const Position &pos) const;
