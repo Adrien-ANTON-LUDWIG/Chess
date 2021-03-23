@@ -21,6 +21,7 @@ namespace ai
         AI() = default;
 
         void play_uci();
+        void bench_uci(const std::string &fen);
 
         virtual board::Move best_move() = 0;
 

@@ -61,8 +61,10 @@ namespace ai
     {
         board::Chessboard board_copy = board;
         if (board_copy.is_checkmate(
-                static_cast<board::Color>(!board_copy.get_side_turn())))
-            return std::numeric_limits<float>::infinity();
+                static_cast<board::Color>(board_copy.get_side_turn())))
+            // return std::numeric_limits<float>::infinity() + 2;
+            // return std::numeric_limits<float>::lowest() + 1;
+            return -9999999;
 
         float pieces_sum = 0.0f;
         float values[] = { 900.0f, 500.0f, 330.0f, 320.0f, 100.0f, 0.0f };

@@ -14,9 +14,6 @@ namespace ai
 {
     void AI::play_uci()
     {
-        std::string logs;
-        std::ofstream log_file("logs");
-
         ai::UCITime uci_time;
         std::string token;
 
@@ -24,9 +21,6 @@ namespace ai
         {
             std::string uci = ai::get_board("PandaISniper", uci_time);
             std::stringstream uci_ss(uci);
-
-            logs += uci + "\n";
-            log_file << logs << std::endl;
 
             uci_ss >> token;
 
@@ -56,5 +50,13 @@ namespace ai
 
             play_move(move.to_ebnf());
         }
+    }
+
+    void AI::bench_uci(const std::string &fen)
+    {
+        std::stringstream fen_ss(fen);
+        board_ = fen_to_board(fen_ss);
+        board::Move move = best_move();
+        play_move(move.to_ebnf());
     }
 } // namespace ai

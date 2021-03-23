@@ -30,7 +30,8 @@ int main(int argc, const char *argv[])
             "listeners,l", po::value<std::vector<std::string>>()->multitoken(),
             "list of paths to listener plugin")(
             "perft", po::value<std::string>(), "path to a perft file")(
-            "play", po::value<std::string>(), "Stdin waits for moves");
+            "play", po::value<std::string>(), "Stdin waits for moves")(
+            "bench", po::value<std::string>(), "fen to test ai time on");
 
         po::variables_map vm;
         po::store(po::parse_command_line(argc, argv, desc), vm);
@@ -68,7 +69,10 @@ int main(int argc, const char *argv[])
             // ai::Negamax ai(e);
             // ai::Random ai;
             ai::AlphaBeta ai(e);
-            ai.play_uci();
+            if (vm.count("bench"))
+                ai.bench_uci(vm["bench"].as<std::string>());
+            else
+                ai.play_uci();
         }
     }
     catch (const po::error &e)
