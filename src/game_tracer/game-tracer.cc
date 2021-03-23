@@ -217,6 +217,7 @@ namespace board
         for (auto move : moves)
             play_pgn_move(move, color);
 
+        exit(0);
         // std::cout << "Pgn - " << pgn_filepath_ << " :\n";
         // board_.print_chessboard(static_cast<Color>(color));
     }
