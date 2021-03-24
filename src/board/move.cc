@@ -219,6 +219,8 @@ namespace board
 
     void Move::execute_move(Chessboard &board)
     {
+        board.halfmove_clock_++;
+
         if (castling_)
             return execute_castling(board);
 
@@ -233,7 +235,7 @@ namespace board
         {
             board.update_piece(opponent_color, capture_->first,
                                capture_->second.to_index(), 0);
-            board.last_fifty_turn_ = 0;
+            board.halfmove_clock_ = 0;
         }
 
         if (board.color_boards_[color_][end])
@@ -249,7 +251,7 @@ namespace board
                 + std::to_string(end_.rank_get()) + ")");
         }
         if (piece_type_ == PieceType::PAWN)
-            board.last_fifty_turn_ = 0;
+            board.halfmove_clock_ = 0;
         if (promotion_)
             type = promotion_type_;
         board.update_piece(color, type, end, 1);

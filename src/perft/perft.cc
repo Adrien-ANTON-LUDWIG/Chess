@@ -68,6 +68,7 @@ int start_game_perft(board::Chessboard board, int depth, board::Color side_turn)
     {
         auto temp_board = board::Chessboard(board);
         moves[i].execute_move(temp_board);
+
         /*
                 {
                     std::cout << "\n---\n";
