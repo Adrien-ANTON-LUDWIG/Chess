@@ -108,6 +108,6 @@ namespace board
         std::array<bool, 2> king_castling_ = { true, true };
         std::array<bool, 2> queen_castling_ = { true, true };
         std::optional<Position> en_passant_ = std::nullopt;
-        int last_fifty_turn_ = 0;
+        int halfmove_clock_ = 0;
     };
 } // namespace board

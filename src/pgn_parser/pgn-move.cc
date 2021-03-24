@@ -49,32 +49,32 @@ namespace board
         report_ = report;
     }
 
-    PieceType PgnMove::get_piece()
+    PieceType PgnMove::get_piece() const
     {
         return piece_;
     }
 
-    const Position PgnMove::get_start()
+    const Position PgnMove::get_start() const
     {
         return start_;
     }
 
-    const Position PgnMove::get_end()
+    const Position PgnMove::get_end() const
     {
         return end_;
     }
 
-    PgnMove::opt_piece_t PgnMove::get_promotion()
+    PgnMove::opt_piece_t PgnMove::get_promotion() const
     {
         return promotion_;
     }
 
-    bool PgnMove::get_capture()
+    bool PgnMove::get_capture() const
     {
         return capture_;
     }
 
-    ReportType PgnMove::get_report()
+    ReportType PgnMove::get_report() const
     {
         return report_;
     }

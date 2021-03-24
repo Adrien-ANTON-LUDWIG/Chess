@@ -27,12 +27,12 @@ namespace board
 
         void report_set(ReportType report);
 
-        PieceType get_piece();
-        const Position get_start();
-        const Position get_end();
-        opt_piece_t get_promotion();
-        bool get_capture();
-        ReportType get_report();
+        PieceType get_piece() const;
+        const Position get_start() const;
+        const Position get_end() const;
+        opt_piece_t get_promotion() const;
+        bool get_capture() const;
+        ReportType get_report() const;
 
     private:
         // The original position of the piece

@@ -425,8 +425,8 @@ namespace board
     {
         static std::array<std::bitset<64>, 2> kc_mask = { 0x0000000000000006,
                                                           0x0600000000000000 };
-        static std::array<std::bitset<64>, 2> qc_mask = { 0x0000000000000030,
-                                                          0x3000000000000000 };
+        static std::array<std::bitset<64>, 2> qc_mask = { 0x0000000000000070,
+                                                          0x7000000000000000 };
 
         std::vector<Move> castling_moves;
         if (Chessboard::is_check(side_turn))
@@ -556,7 +556,7 @@ namespace board
 
     bool Chessboard::is_draw()
     {
-        return last_fifty_turn_ >= 50;
+        return halfmove_clock_ >= 100;
     }
 
     bool Chessboard::is_equivalent(const Chessboard &other)
