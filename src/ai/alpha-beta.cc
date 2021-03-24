@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <iostream>
 
-#define DEPTH 3
+#define DEPTH 4
 
 namespace ai
 {
